@@ -1,25 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
-
+import { BrowserRouter, Route, useHistory } from "react-router-dom";
+import AppNavigation from "./components/AppNavigation";
+import Footer from "./components/Footer";
+import Header from "./components/Header";
+import SideNav from "./components/SideNav";
+import ScrollTop from "./components/ScrollTop";
+import "react-toastify/dist/ReactToastify.css";
+import Login from "./pages/Login";
+import { useNavigate } from "react-router-dom";
 function App() {
+  // const user_details = localStorage.getItem("login_info");
+  // const user = user_details.userInfo;
+  // console.log(user_details);
+
+  // if (user_details != null) {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <div className="wrapper">
+        <SideNav />
+        <div className="main">
+          <Header />
+          <AppNavigation />
+          <Footer />
+        </div>
+      </div>
+    </BrowserRouter>
   );
+  // } else {
+  //   return (
+  //     <BrowserRouter>
+  //       <AppNavigation />
+  //     </BrowserRouter>
+  //   );
+  // }
 }
 
 export default App;
