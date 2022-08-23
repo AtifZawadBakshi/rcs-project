@@ -9,7 +9,18 @@ import {
   ExpandCircleDown,
 } from "@mui/icons-material";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Login from "../pages/Login";
 const Header = () => {
+  const navigate = useNavigate();
+  let user_details = JSON.parse(localStorage.getItem("login_info"));
+
+  const handleLogout = (event) => {
+    event.preventDefault();
+    localStorage.removeItem("login_info");
+    navigate("/login");
+    window.location.reload();
+  };
   return (
     <nav className="navbar navbar-expand navbar-light navbar-bg">
       <div className="sidebar-toggle js-sidebar-toggle d-inline-block d-lg-none mb-2">
@@ -58,12 +69,12 @@ const Header = () => {
                   marginRight: "10px",
                 }}
               >
-                Atif Zawad Bakshi
+                {user_details.userInfo.User_ID}
               </span>
               <ExpandCircleDown />
             </div>
             <div className="dropdown-menu dropdown-menu-end">
-              <Link className="dropdown-item" to="/profile">
+              {/* <Link className="dropdown-item" to="/profile">
                 <PersonOutlineOutlined sx={{ marginRight: 3 }} />
                 Profile
               </Link>
@@ -72,12 +83,16 @@ const Header = () => {
                 <SettingsSuggestOutlined sx={{ marginRight: 3 }} />
                 Settings
               </Link>
-              <div className="dropdown-divider" />
+              <div className="dropdown-divider" /> */}
 
-              <Link className="dropdown-item" to="/logout">
+              <div
+                className="dropdown-item"
+                style={{ cursor: "pointer" }}
+                onClick={handleLogout}
+              >
                 <LogoutOutlined sx={{ marginRight: 3 }} />
                 Log out
-              </Link>
+              </div>
             </div>
           </li>
         </ul>

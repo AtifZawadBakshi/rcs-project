@@ -4,10 +4,12 @@ import TextField from "@mui/material/TextField";
 import { URL, LOGIN } from "../Axios/Api";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import "react-toastify/dist/ReactToastify.css";
 const Login = () => {
   const [userName, setUseName] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
   const handleSubmit = (event) => {
     event.preventDefault();
     let userDetails = {
@@ -20,7 +22,6 @@ const Login = () => {
         .post(URL + LOGIN, userDetails)
         .then((response) => {
           if (response.data.access_token) {
-            localStorage.setItem("login_info", JSON.stringify(response.data));
             toast.success("Login has been successfull!", {
               position: "top-right",
               autoClose: 4000,
@@ -30,12 +31,16 @@ const Login = () => {
               draggable: true,
               progress: undefined,
             });
+            localStorage.setItem("login_info", JSON.stringify(response.data));
+            console.log(JSON.parse(localStorage.getItem("login_info")));
+            navigate("/");
+            window.location.reload();
           }
         })
         .catch((response) => {
-          toast.error(response.response.data.msg, {
+          toast.error("Invalid User name or Password!", {
             position: "top-right",
-            autoClose: 5000,
+            autoClose: 2000,
             hideProgressBar: false,
             closeOnClick: true,
             pauseOnHover: true,
@@ -63,9 +68,7 @@ const Login = () => {
                       <img
                         src="/img/photos/Fair-Group-Logo.png"
                         alt="Charles Hall"
-                        className="img-fluid rounded-circle"
-                        width={132}
-                        height={132}
+                        className="img-fluid"
                       />
                     </div>
                     <form onSubmit={handleSubmit}>

@@ -50,7 +50,7 @@ const SideNav = () => {
               <span className="align-middle">Cencus Data List</span>
             </NavLink>
           </li>
-          <li className="sidebar-item">
+          {/* <li className="sidebar-item">
             <NavLink
               className="sidebar-link"
               to="/test"
@@ -59,7 +59,7 @@ const SideNav = () => {
               <TextSnippet />
               <span className="align-middle">Test</span>
             </NavLink>
-          </li>
+          </li> */}
         </ul>
       </div>
     </nav>

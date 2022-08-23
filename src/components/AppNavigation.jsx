@@ -6,11 +6,12 @@ import Test from "../pages/Test";
 import Logout from "./Logout";
 import Login from "../pages/Login";
 import RequireAuth from "../Auth/RequireAuth";
+import PrivateRoutes from "../Auth/PrivateRoutes";
 const AppNavigation = () => {
-  let user_details = JSON.parse(localStorage.getItem("user_info"));
-  // const user = user_details.userInfo;
+  let user_details = JSON.parse(localStorage.getItem("login_info"));
+  console.log(user_details);
   let isLoggedIn = false;
-  if (user_details && user_details != null) {
+  if (user_details != null) {
     isLoggedIn = true;
   } else {
     isLoggedIn = false;
@@ -28,13 +29,19 @@ const AppNavigation = () => {
           <Route path="logout" element={<Logout />} />
         </Route>
       </Routes> */}
-      <Routes>
+      {/* <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="cencusdata-list" element={<CencusDataList />} />
         <Route path="test" element={<Test />} />
-        <Route path="login" element={<Login />} />
-        <Route path="logout" element={<Logout />} />
+      </Routes> */}
+      <Routes>
+        <Route element={<PrivateRoutes loginstatus={isLoggedIn} />}>
+          <Route path="/" element={<Dashboard />} exact />
+          <Route path="cencusdata-list" element={<CencusDataList />} />
+          <Route path="test" element={<Test />} />
+        </Route>
+        <Route element={<Login />} path="/login" />
       </Routes>
     </>
   );

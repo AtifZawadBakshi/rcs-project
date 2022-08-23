@@ -22,6 +22,8 @@ import { upazillaList } from "../demoData";
 import axios from "axios";
 const Dashboard = () => {
   //STATE DICLARE
+  let user_details = JSON.parse(localStorage.getItem("login_info"));
+
   const [defaultCategoryValue, setDefaultCategoryValue] = useState("");
   const [defaultSubcategoryValue, setDefaultSubcategoryValue] = useState("");
   const [division, setDivision] = useState(0);
@@ -36,10 +38,11 @@ const Dashboard = () => {
   const [felPartner, setFelPartner] = useState("");
   const [ownerName, setOwnerName] = useState("");
   const [ownerNumber, setOwnerNumber] = useState("");
-  const [csm, setCsm] = useState("");
-  const [asm, setAsm] = useState("");
-  const [tsm, settsm] = useState("");
+  const [csm, setCsm] = useState(user_details.userInfo.CSM_Name);
+  const [asm, setAsm] = useState(user_details.userInfo.ASM_Name);
+  const [tsm, settsm] = useState(user_details.userInfo.TSM_Name);
   const [subcategoryOptions, setSubcategoryOptions] = useState([]);
+  const [subcategory, setSubcategory] = useState([{ subcategory_name: "" }]);
   const [productDetails, setProductDetails] = useState([
     {
       category_id: 0,
@@ -106,8 +109,9 @@ const Dashboard = () => {
   };
   const handleSubcategoryChange = (index, event) => {
     const values = [...productDetails];
-    console.log(event.target.value);
+    console.log(event.target);
     values[index]["subcategory_id"] = event.target.value;
+    // subcategory[index]["subcategory_name"] = event.target.value;
     setProductDetails(values);
   };
   const handleChangeInput = (index, event) => {
@@ -116,6 +120,7 @@ const Dashboard = () => {
     setProductDetails(values);
   };
   const handleAddButton = () => {
+    setSubcategory([...subcategory, { subcategory_name: "" }]);
     setProductDetails([
       ...productDetails,
       {
@@ -147,14 +152,10 @@ const Dashboard = () => {
       draggable: true,
       progress: undefined,
     });
-
-    // enqueueSnackbar("Successfully added new segment!", "success");
   };
   const handleRemoveButton = (index) => {
     const list = [...productDetails];
     list.splice(index, 1);
-
-    // enqueueSnackbar("Successfully deleted the segment!", "success");
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -198,43 +199,31 @@ const Dashboard = () => {
     };
     console.log(submittedData);
     const submitData = async () => {
-      const res = await axios
+      await axios
         .post(URL + SUBMIT_DATA, submittedData)
         .then((response) => console.log(response));
-      setDefaultCategoryValue("");
-      setDefaultSubcategoryValue("");
-      setProductDetails([
-        {
-          category_id: 0,
-          subcategory_id: 0,
-          samsung_brand: { name: "SAMSUNG", qnty: 0 },
-          sony_brand: { name: "SONY", qnty: 0 },
-          lg_brand: { name: "LG", qnty: 0 },
-          oth_foreign_brand: { name: "OTH-FOREIGN", qnty: 0 },
-          walton_brand: { name: "WALTON", qnty: 0 },
-          singer_brand: { name: "SINGER", qnty: 0 },
-          vision_brand: { name: "VISION", qnty: 0 },
-          sharp_brand: { name: "SHARP", qnty: 0 },
-          oth_bd_brand: { name: "OTH-BD", qnty: 0 },
-          hitachi_brand: { name: "HITACHI", qnty: 0 },
-          jamuna_brand: { name: "JAMUNA", qnty: 0 },
-          eco_plus_brand: { name: "ECO PLUS", qnty: 0 },
-          miyako_brand: { name: "MIYAKO", qnty: 0 },
-          gree_brand: { name: "GREE", qnty: 0 },
-          midea_brand: { name: "MIDEA", qnty: 0 },
-        },
-      ]);
     };
-    // submitData();
+
     Swal.fire({
       title: "Do you want to submit the details?",
       showCancelButton: true,
       confirmButtonText: "Submit",
     }).then((result) => {
-      /* Read more about isConfirmed, isDenied below */
       if (result.isConfirmed) {
         submitData();
-        Swal.fire("Submitted!", "", "success");
+        setProductDetails([]);
+        console.log("DATA SUBMITTED");
+        setDefaultCategoryValue("");
+        setDefaultSubcategoryValue("");
+        toast.success("Successfully Submitted!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
       }
     });
   };
@@ -478,6 +467,9 @@ const Dashboard = () => {
                         <span style={{ fontWeight: "bold" }}>CSM Name</span>
                       </Form.Label>
                       <TextField
+                        InputProps={{
+                          readOnly: true,
+                        }}
                         fullWidth
                         required={true}
                         className="mt-2"
@@ -497,6 +489,9 @@ const Dashboard = () => {
                       </Form.Label>
                       <TextField
                         fullWidth
+                        InputProps={{
+                          readOnly: true,
+                        }}
                         required={true}
                         className="mt-2"
                         label="Enter ASM name"
@@ -514,6 +509,9 @@ const Dashboard = () => {
                         <span style={{ fontWeight: "bold" }}>TSM Name</span>
                       </Form.Label>
                       <TextField
+                        InputProps={{
+                          readOnly: true,
+                        }}
                         fullWidth
                         required={true}
                         className="mt-2"
@@ -534,6 +532,7 @@ const Dashboard = () => {
                             <span
                               style={{
                                 fontWeight: "bold",
+                                fontSize: "15px",
                               }}
                             >
                               Select Category:
@@ -566,19 +565,20 @@ const Dashboard = () => {
                           </Form.Group>
                         </div>
                       </div>
-                      <div className="col-12	col-sm-12	col-md-5	col-lg-5	col-xl-5	col-xxl-5 ">
+                      <div className="col-12	col-sm-12	col-md-6	col-lg-5	col-xl-6	col-xxl-6 ">
                         <div className=" row d-flex justify-content-between align-items-center">
-                          <Form.Label className="col-6">
+                          <Form.Label className="col-4">
                             <span
                               style={{
                                 fontWeight: "bold",
+                                fontSize: "15px",
                               }}
                             >
                               Select Subcategory:
                             </span>
                           </Form.Label>
                           <Form.Group
-                            className="col-6 mb-4"
+                            className="col-8 mb-4"
                             controlId="exampleForm.ControlInput1"
                           >
                             <FormControl fullWidth>
@@ -590,14 +590,26 @@ const Dashboard = () => {
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
                                 label="Choose a subcategory"
+                                // value={subcategory[index].subcategory_name}
                                 onChange={(event) => {
                                   handleSubcategoryChange(index, event);
                                 }}
                               >
+                                {subcategoryOptions.length === 0 ? (
+                                  <MenuItem value="">
+                                    <em>No options</em>
+                                  </MenuItem>
+                                ) : (
+                                  <MenuItem value="">
+                                    <em>None</em>
+                                  </MenuItem>
+                                )}
+
                                 {subcategoryOptions.map((option, index) => (
                                   <MenuItem
                                     key={option.Sub_Cat_ID}
                                     value={option.Sub_Cat_ID}
+                                    name={option.Sub_Cat_Name}
                                   >
                                     {option.Sub_Category_Name}
                                   </MenuItem>
@@ -609,7 +621,7 @@ const Dashboard = () => {
                       </div>
                       {productDetails.length > 1 &&
                       productDetails.length - 1 === index ? (
-                        <div className="col-12	col-sm-12	col-md-2	col-lg-2	col-xl-2	col-xxl-2 ">
+                        <div className="col-12	col-sm-12	col-md-1	col-lg-1	col-xl-1	col-xxl-1 ">
                           <div className="d-flex justify-content-end align-items-center">
                             <Button
                               className="mx-2"
