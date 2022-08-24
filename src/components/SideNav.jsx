@@ -43,7 +43,7 @@ const SideNav = () => {
           <li className="sidebar-item">
             <NavLink
               className="sidebar-link"
-              to="/cencusdata-list"
+              to="/cencus-datalist"
               style={({ isActive }) => (isActive ? activeStyle : undefined)}
             >
               <ViewList />

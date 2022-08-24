@@ -16,7 +16,7 @@ const Login = () => {
       userID: userName,
       Password: password,
     };
-    console.log(userDetails);
+
     const LoginSubmit = async () => {
       const res = await axios
         .post(URL + LOGIN, userDetails)
@@ -32,7 +32,6 @@ const Login = () => {
               progress: undefined,
             });
             localStorage.setItem("login_info", JSON.stringify(response.data));
-            console.log(JSON.parse(localStorage.getItem("login_info")));
             navigate("/");
             window.location.reload();
           }

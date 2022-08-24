@@ -24,7 +24,7 @@ const AppNavigation = () => {
         <Route path="/" element={<RequireAuth />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="cencusdata-list" element={<CencusDataList />} />
+          <Route path="cencus-datalist" element={<CencusDataList />} />
           <Route path="test" element={<Test />} />
           <Route path="logout" element={<Logout />} />
         </Route>
@@ -32,13 +32,13 @@ const AppNavigation = () => {
       {/* <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="cencusdata-list" element={<CencusDataList />} />
+        <Route path="cencus-datalist" element={<CencusDataList />} />
         <Route path="test" element={<Test />} />
       </Routes> */}
       <Routes>
         <Route element={<PrivateRoutes loginstatus={isLoggedIn} />}>
           <Route path="/" element={<Dashboard />} exact />
-          <Route path="cencusdata-list" element={<CencusDataList />} />
+          <Route path="cencus-datalist" element={<CencusDataList />} />
           <Route path="test" element={<Test />} />
         </Route>
         <Route element={<Login />} path="/login" />

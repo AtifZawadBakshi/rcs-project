@@ -9,8 +9,9 @@ import { Routes } from "react-router-dom";
 import PrivateRoutes from "./Auth/PrivateRoutes";
 import Dashboard from "./pages/Dashboard";
 import CencusDataList from "./pages/CencusDataList";
+import CencusData from "./pages/CencusData";
 function App() {
-  let user_details = JSON.parse(localStorage.getItem("login_info"));
+  let user_details = JSON.parse(localStorage.getItem("login_info")) || null;
   console.log(user_details);
   let isLoggedIn = false;
   if (user_details != null) {
@@ -28,7 +29,11 @@ function App() {
             <Routes>
               <Route element={<PrivateRoutes isLoggedIn={isLoggedIn} />}>
                 <Route path="/" element={<Dashboard />} exact />
-                <Route path="cencusdata-list" element={<CencusDataList />} />
+                <Route path="cencus-datalist" element={<CencusDataList />} />
+                <Route
+                  path="cencus-datalist/:cencusID"
+                  element={<CencusData />}
+                />
               </Route>
             </Routes>
             <Footer />
@@ -42,7 +47,8 @@ function App() {
         <Routes>
           <Route element={<PrivateRoutes isLoggedIn={isLoggedIn} />}>
             <Route path="/" element={<Dashboard />} exact />
-            <Route path="cencusdata-list" element={<CencusDataList />} />
+            <Route path="cencus-datalist" element={<CencusDataList />} />
+            <Route path="cencus-datalist/:cencusID" element={<CencusData />} />
           </Route>
           <Route element={<Login />} path="/login" />
         </Routes>

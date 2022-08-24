@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -12,6 +12,9 @@ import { Button } from "react-bootstrap";
 import { styled } from "@mui/material/styles";
 import Modal from "react-bootstrap/Modal";
 import { Card } from "@mui/material";
+import { URL, FETCH_DATA } from "../Axios/Api";
+import axios from "axios";
+import { Link, Outlet } from "react-router-dom";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -52,546 +55,33 @@ const columns = [
   },
 ];
 
-const submittedData = [
-  {
-    id: 1,
-    date_time: "23 August 2023 04:00PM",
-    division_name: "Chiitagong",
-    district_name: "Chiitagong",
-    upazilla_name: "Cox's Bazar",
-    location_details: "12/B ABC, BD Street",
-    retail_name: "SAMSUNG Bangladesh",
-    retail_type: "Premium",
-    store_size: "2000 sqft",
-    fel_partner: true,
-    owner_name: "Atif Zawad Bakshi",
-    owner_number: "01721624775",
-    csm_name: "ABC NSKJSO SLKSP",
-    asm_name: "PWIW SOSPMWS SKSP",
-    tsm_name: "SKSIS SJSOS BSSI",
-    enrolled_products_details: [
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-    ],
-  },
-  {
-    id: 2,
-    date_time: "24 August 2023 04:00PM",
-    division_name: "Chiitagong",
-    district_name: "Chiitagong",
-    upazilla_name: "Cox's Bazar",
-    location_details: "12/B ABC, BD Street",
-    retail_name: "SAMSUNG Bangladesh",
-    retail_type: "Premium",
-    store_size: "2000 sqft",
-    fel_partner: true,
-    owner_name: "Atif Zawad Bakshi",
-    owner_number: "01721624775",
-    csm_name: "ABC NSKJSO SLKSP",
-    asm_name: "PWIW SOSPMWS SKSP",
-    tsm_name: "SKSIS SJSOS BSSI",
-    enrolled_products_details: [
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-    ],
-  },
-  {
-    id: 3,
-    date_time: "25 August 2023 04:00PM",
-    division_name: "Chiitagong",
-    district_name: "Chiitagong",
-    upazilla_name: "Cox's Bazar",
-    location_details: "12/B ABC, BD Street",
-    retail_name: "SAMSUNG Bangladesh",
-    retail_type: "Premium",
-    store_size: "2000 sqft",
-    fel_partner: true,
-    owner_name: "Atif Zawad Bakshi",
-    owner_number: "01721624775",
-    csm_name: "ABC NSKJSO SLKSP",
-    asm_name: "PWIW SOSPMWS SKSP",
-    tsm_name: "SKSIS SJSOS BSSI",
-    enrolled_products_details: [
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-    ],
-  },
-  {
-    id: 4,
-    date_time: "26 August 2023 04:00PM",
-    division_name: "Chiitagong",
-    district_name: "Chiitagong",
-    upazilla_name: "Cox's Bazar",
-    location_details: "12/B ABC, BD Street",
-    retail_name: "SAMSUNG Bangladesh",
-    retail_type: "Premium",
-    store_size: "2000 sqft",
-    fel_partner: true,
-    owner_name: "Atif Zawad Bakshi",
-    owner_number: "01721624775",
-    csm_name: "ABC NSKJSO SLKSP",
-    asm_name: "PWIW SOSPMWS SKSP",
-    tsm_name: "SKSIS SJSOS BSSI",
-    enrolled_products_details: [
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-      {
-        category_name: "TV Category",
-        subcategory_name: "FHD",
-        samsung_qnty: 0,
-        sony_qnty: 0,
-        lg_qnty: 0,
-        oth_foreign_qnty: 0,
-        walton_qnty: 0,
-        singer_qnty: 0,
-        vision_qnty: 0,
-        oth_bd_qnty: 0,
-        hitachi_qnty: 0,
-        jamuna_qnty: 0,
-        sharp_qnty: 0,
-        eco_plus_qnty: 0,
-        miyako_qnty: 0,
-        gree_qnty: 0,
-        midea_qnty: 0,
-      },
-    ],
-  },
-];
-
 const CencusDataList = () => {
+  const user_details = JSON.parse(localStorage.getItem("login_info"));
+  const accessToken = user_details.access_token || null;
+
+  const authAxios = axios.create({
+    baseURL: URL,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [rowsPerPage, setRowsPerPage] = React.useState(7);
   const [modalShow, setModalShow] = React.useState(false);
   const [modalData, setModalData] = React.useState([]);
+  const [submittedData, setSubmittedData] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchData() {
+      const res = await authAxios.get(URL + FETCH_DATA).then((response) => {
+        setSubmittedData(response.data);
+        setLoading(true);
+      });
+    }
+    fetchData();
+  }, []);
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -602,22 +92,22 @@ const CencusDataList = () => {
   };
   const modalonClick = async (event) => {
     console.log(event);
-    await setModalData(event);
+    setModalData(event);
     setModalShow(true);
   };
   const modalonClose = (event) => {
     setModalShow(false);
   };
   return (
-    <main className="content">
-      <div className="container-fluid p-0">
-        <h1 className="h3 mb-3">Cencus Data List Page</h1>
+    <main className="content m-0">
+      <div className="container-fluid p-0 m-0">
+        <h1 className="h3 mb-3">Cencus Data List</h1>
         <div className="row">
           <div className="col-12">
             <div className="card">
               <div className="card-body">
                 <Paper sx={{ width: "100%", overflow: "hidden" }}>
-                  <TableContainer sx={{ height: 600 }}>
+                  <TableContainer sx={{ height: 570 }}>
                     <Table stickyHeader aria-label="sticky table">
                       <TableHead>
                         <TableRow>
@@ -632,50 +122,61 @@ const CencusDataList = () => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {submittedData
-                          .slice(
-                            page * rowsPerPage,
-                            page * rowsPerPage + rowsPerPage
-                          )
-                          .map((data, id) => {
-                            return (
-                              <TableRow hover key={data.id}>
-                                <TableCell>{data.date_time}</TableCell>
-                                <TableCell align="center">
-                                  {data.division_name}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {data.district_name}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {data.upazilla_name}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {data.retail_name}
-                                </TableCell>
-                                <TableCell align="center">
-                                  {data.enrolled_products_details.length}
-                                </TableCell>
-                                <TableCell align="center">
-                                  <div className="d-flex justify-content-around align-content-center">
-                                    <Button
-                                      variant="scondary"
-                                      sx={{ ":hover": { border: "6px solid" } }}
-                                      onClick={() => modalonClick(data)}
-                                    >
-                                      <Visibility />
-                                      Show
-                                    </Button>
-
-                                    <Button variant="warning">
-                                      <Edit />
-                                      Edit
-                                    </Button>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            );
-                          })}
+                        {loading &&
+                          submittedData
+                            .slice(
+                              page * rowsPerPage,
+                              page * rowsPerPage + rowsPerPage
+                            )
+                            .map((data, id) => {
+                              return (
+                                <TableRow hover key={data.transId}>
+                                  <TableCell>
+                                    {data.created_date +
+                                      " " +
+                                      data.created_time}
+                                  </TableCell>
+                                  <TableCell align="center">
+                                    {data.division.Division_Name}
+                                  </TableCell>
+                                  <TableCell align="center">
+                                    {data.district.District_Name}
+                                  </TableCell>
+                                  <TableCell align="center">
+                                    {data.upazila.Upazila_Name}
+                                  </TableCell>
+                                  <TableCell align="center">
+                                    {data.retail_name}
+                                  </TableCell>
+                                  <TableCell align="center">
+                                    {data.enrolled_products.length}
+                                  </TableCell>
+                                  <TableCell align="center">
+                                    <div className="d-flex justify-content-around align-content-center">
+                                      <Button
+                                        variant="scondary"
+                                        sx={{
+                                          ":hover": { border: "6px solid" },
+                                        }}
+                                        onClick={() => modalonClick(data)}
+                                      >
+                                        <Visibility />
+                                        Show
+                                      </Button>
+                                      <Link
+                                        to={`/cencus-datalist/${data.transId}`}
+                                      >
+                                        <Button variant="warning">
+                                          <Edit />
+                                          Edit
+                                        </Button>
+                                      </Link>
+                                    </div>
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
+                        <Outlet />
                       </TableBody>
                       {modalShow && (
                         <Modal
@@ -708,19 +209,19 @@ const CencusDataList = () => {
                                     <tr>
                                       <th align="right">Division:</th>
                                       <td align="left">
-                                        {modalData.division_name}
+                                        {modalData.division.Division_Name}
                                       </td>
                                     </tr>
                                     <tr>
                                       <th align="right">District:</th>
                                       <td align="left">
-                                        {modalData.district_name}
+                                        {modalData.district.District_Name}
                                       </td>
                                     </tr>
                                     <tr>
                                       <th align="right">Upazila:</th>
                                       <td align="left">
-                                        {modalData.upazilla_name}
+                                        {modalData.upazila.Upazila_Name}
                                       </td>
                                     </tr>
                                     <tr>
@@ -744,7 +245,9 @@ const CencusDataList = () => {
                                     <tr>
                                       <th align="right">Date & Time:</th>
                                       <td align="left">
-                                        {modalData.date_time}
+                                        {modalData.created_date +
+                                          " " +
+                                          modalData.created_time}
                                       </td>
                                     </tr>
                                   </tbody>
@@ -760,13 +263,15 @@ const CencusDataList = () => {
                                     <tr>
                                       <th align="right">Store Size:</th>
                                       <td align="left">
-                                        {modalData.store_size}
+                                        {modalData.store_size} sqft
                                       </td>
                                     </tr>
                                     <tr>
                                       <th align="right">FEL Partner:</th>
                                       <td align="left">
-                                        {modalData.fel_partner ? "Yes" : "No"}
+                                        {modalData.fel_partner === 1
+                                          ? "Yes"
+                                          : "No"}
                                       </td>
                                     </tr>
                                     <tr>
@@ -803,7 +308,7 @@ const CencusDataList = () => {
                               </h6>
                             </div>
                             <div className="row d-flex justify-content-around align-items-center">
-                              {modalData.enrolled_products_details.map(
+                              {modalData.enrolled_products.map(
                                 (product, index) => (
                                   <div className="col-6 my-1" key={index}>
                                     <Card>
@@ -819,11 +324,14 @@ const CencusDataList = () => {
                                           <tr>
                                             <th align="right">CATEGORY:</th>
                                             <td align="left">
-                                              {product.category_name}
+                                              {product.category.category_name}
                                             </td>
                                             <th align="right">SUBCATEGORY:</th>
                                             <td align="left">
-                                              {product.subcategory_name}
+                                              {
+                                                product.Sub_category
+                                                  .sub_cat_name
+                                              }
                                             </td>
                                           </tr>
                                         </tbody>
@@ -847,79 +355,79 @@ const CencusDataList = () => {
                                           <tr>
                                             <td align="center">SAMSUNG</td>
                                             <td align="center">
-                                              {product.samsung_qnty}
+                                              {product.samsumg_brand}
                                             </td>
                                             <td align="center">SONY</td>
                                             <td align="center">
-                                              {product.sony_qnty}
+                                              {product.sony_brand}
                                             </td>
                                           </tr>
                                           <tr>
                                             <td align="center">LG</td>
                                             <td align="center">
-                                              {product.lg_qnty}
+                                              {product.lg_brand}
                                             </td>
                                             <td align="center">
                                               OTH - FOREIGN
                                             </td>
                                             <td align="center">
-                                              {product.oth_foreign_qnty}
+                                              {product.oth_foreign_brand}
                                             </td>
                                           </tr>
                                           <tr>
                                             <td align="center">WALTON</td>
                                             <td align="center">
-                                              {product.walton_qnty}
+                                              {product.walton_brand}
                                             </td>
                                             <td align="center">SINGER</td>
                                             <td align="center">
-                                              {product.singer_qnty}
+                                              {product.singer_brand}
                                             </td>
                                           </tr>
                                           <tr>
                                             <td align="center">MIDEA</td>
                                             <td align="center">
-                                              {product.midea_qnty}
+                                              {product.midea_brand}
                                             </td>
                                             <td align="center">VISION</td>
                                             <td align="center">
-                                              {product.vision_qnty}
+                                              {product.vision_brand}
                                             </td>
                                           </tr>
                                           <tr>
                                             <td align="center">OTH-BD</td>
                                             <td align="center">
-                                              {product.oth_bd_qnty}
+                                              {product.oth_bd_brand}
                                             </td>
                                             <td align="center">HITACHI</td>
                                             <td align="center">
-                                              {product.hitachi_qnty}
+                                              {product.hitachi_brand}
                                             </td>
                                           </tr>
                                           <tr>
                                             <td align="center">JAMUNA</td>
                                             <td align="center">
-                                              {product.jamuna_qnty}
+                                              {product.jamuna_brand}
                                             </td>
                                             <td align="center">SHARP</td>
                                             <td align="center">
-                                              {product.sharp_qnty}
+                                              {product.sharp_brand}
                                             </td>
                                           </tr>
                                           <tr>
                                             <td align="center">ECO PLUS</td>
                                             <td align="center">
-                                              {product.eco_plus_qnty}
+                                              {product.eco_plus_brand}
                                             </td>
                                             <td align="center">MIYAKO</td>
                                             <td align="center">
-                                              {product.miyako_qnty}
+                                              {product.miyako_brand}
                                             </td>
                                           </tr>
                                           <tr>
                                             <td align="center">GREE</td>
                                             <td align="center">
-                                              {product.gree_qnty}
+                                              {product.gree_brand}
                                             </td>
                                           </tr>
                                         </tbody>
@@ -938,7 +446,7 @@ const CencusDataList = () => {
                     </Table>
                   </TableContainer>
                   <TablePagination
-                    rowsPerPageOptions={[10, 15, 20]}
+                    rowsPerPageOptions={[7, 10, 15, 20]}
                     sx={{
                       display: "flex",
                       justifyContent: "end",

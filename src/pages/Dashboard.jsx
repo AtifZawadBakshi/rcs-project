@@ -3,10 +3,9 @@ import { Form, Button } from "react-bootstrap";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
-import { RestartAlt, Save, AddCircle, Delete } from "@mui/icons-material";
+import { Save, AddCircle, Delete } from "@mui/icons-material";
 import { brandList } from "../demoData";
 import divisionList from "../demoData";
-import { SnackbarProvider, useSnackbar } from "notistack";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Swal from "sweetalert2";
@@ -17,12 +16,18 @@ import {
   GET_SUBCATEGORY,
   SUBMIT_DATA,
 } from "../Axios/Api";
-import { districtList } from "../demoData";
-import { upazillaList } from "../demoData";
 import axios from "axios";
 const Dashboard = () => {
   //STATE DICLARE
-  let user_details = JSON.parse(localStorage.getItem("login_info"));
+  const user_details = JSON.parse(localStorage.getItem("login_info"));
+  const accessToken = user_details.access_token || null;
+
+  const authAxios = axios.create({
+    baseURL: URL,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
 
   const [defaultCategoryValue, setDefaultCategoryValue] = useState("");
   const [defaultSubcategoryValue, setDefaultSubcategoryValue] = useState("");
@@ -66,11 +71,11 @@ const Dashboard = () => {
   ]);
 
   const handleDivisionChange = (event, newValue) => {
-    setDivision(newValue.id);
+    setDivision(newValue.Division_ID);
     const getDistrictList = async () => {
-      const res = await axios
+      const res = await authAxios
         .post(URL + GET_DISTRICT, {
-          id: newValue.id,
+          id: newValue.Division_ID,
         })
         .then((response) => setDistrictOptions(response.data.districtList));
     };
@@ -79,7 +84,7 @@ const Dashboard = () => {
   const handleDistrictChange = (event, newValue) => {
     setDistrict(newValue.District_ID);
     const getUpazila = async () => {
-      const res = await axios
+      const res = await authAxios
         .post(URL + GET_UPAZILA, {
           id: newValue.District_ID,
         })
@@ -97,7 +102,7 @@ const Dashboard = () => {
     setProductDetails(values);
 
     const getSubcategoryList = async () => {
-      const res = await axios
+      const res = await authAxios
         .post(URL + GET_SUBCATEGORY, {
           id: categoryid,
         })
@@ -199,7 +204,7 @@ const Dashboard = () => {
     };
     console.log(submittedData);
     const submitData = async () => {
-      await axios
+      await authAxios
         .post(URL + SUBMIT_DATA, submittedData)
         .then((response) => console.log(response));
     };
@@ -247,7 +252,7 @@ const Dashboard = () => {
                         onChange={handleDivisionChange}
                         disablePortal
                         options={divisionList}
-                        getOptionLabel={(option) => option.name}
+                        getOptionLabel={(option) => option.Division_Name}
                         renderInput={(params) => (
                           <TextField
                             {...params}

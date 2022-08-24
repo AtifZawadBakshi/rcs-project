@@ -5,3 +5,6 @@ export const GET_UPAZILA = "upazila";
 export const GET_SUBCATEGORY = "subcategory";
 export const SUBMIT_DATA = "transInfo";
 export const LOGIN = "login";
+export const FETCH_DATA = "details";
+export const UPDATE_DATA = "info";
+export const UPDATE_SUBMIT = "update";
