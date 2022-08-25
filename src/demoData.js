@@ -50,6 +50,7 @@ export const brandList = [
   "GREE",
   "MIDEA",
 ];
+
 export const categoryList = [
   { category_Id: 5, category_name: "MWO Category" },
   { category_Id: 6, category_name: "RAC Category" },
@@ -57,4 +58,5 @@ export const categoryList = [
   { category_Id: 2, category_name: "TV Category" },
   { category_Id: 4, category_name: "WM Category" },
 ];
+
 export default divisionList;

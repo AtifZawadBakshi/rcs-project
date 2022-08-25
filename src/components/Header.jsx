@@ -3,18 +3,15 @@ import {
   AccountBox,
   Menu,
   LogoutOutlined,
-  PersonOutlineOutlined,
   AccountCircle,
-  SettingsSuggestOutlined,
   ExpandCircleDown,
 } from "@mui/icons-material";
-import { Link } from "react-router-dom";
+
 import { useNavigate } from "react-router-dom";
-import Login from "../pages/Login";
+
 const Header = () => {
   const navigate = useNavigate();
   let user_details = JSON.parse(localStorage.getItem("login_info"));
-
   const handleLogout = (event) => {
     event.preventDefault();
     localStorage.removeItem("login_info");
@@ -69,22 +66,11 @@ const Header = () => {
                   marginRight: "10px",
                 }}
               >
-                {user_details.userInfo.User_ID}
+                {user_details.userInfo.TSM_Name}
               </span>
               <ExpandCircleDown />
             </div>
             <div className="dropdown-menu dropdown-menu-end">
-              {/* <Link className="dropdown-item" to="/profile">
-                <PersonOutlineOutlined sx={{ marginRight: 3 }} />
-                Profile
-              </Link>
-
-              <Link className="dropdown-item" to="/settings">
-                <SettingsSuggestOutlined sx={{ marginRight: 3 }} />
-                Settings
-              </Link>
-              <div className="dropdown-divider" /> */}
-
               <div
                 className="dropdown-item"
                 style={{ cursor: "pointer" }}

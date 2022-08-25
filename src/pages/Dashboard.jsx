@@ -28,9 +28,6 @@ const Dashboard = () => {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-
-  const [defaultCategoryValue, setDefaultCategoryValue] = useState("");
-  const [defaultSubcategoryValue, setDefaultSubcategoryValue] = useState("");
   const [division, setDivision] = useState(0);
   const [district, setDistrict] = useState(0);
   const [districtOptions, setDistrictOptions] = useState([]);
@@ -116,7 +113,6 @@ const Dashboard = () => {
     const values = [...productDetails];
     console.log(event.target);
     values[index]["subcategory_id"] = event.target.value;
-    // subcategory[index]["subcategory_name"] = event.target.value;
     setProductDetails(values);
   };
   const handleChangeInput = (index, event) => {
@@ -204,9 +200,7 @@ const Dashboard = () => {
     };
     console.log(submittedData);
     const submitData = async () => {
-      await authAxios
-        .post(URL + SUBMIT_DATA, submittedData)
-        .then((response) => console.log(response));
+      await authAxios.post(URL + SUBMIT_DATA, submittedData);
     };
 
     Swal.fire({
@@ -217,9 +211,6 @@ const Dashboard = () => {
       if (result.isConfirmed) {
         submitData();
         setProductDetails([]);
-        console.log("DATA SUBMITTED");
-        setDefaultCategoryValue("");
-        setDefaultSubcategoryValue("");
         toast.success("Successfully Submitted!", {
           position: "top-right",
           autoClose: 5000,
@@ -232,10 +223,13 @@ const Dashboard = () => {
       }
     });
   };
+
   return (
     <main className="content">
       <div className="container-fluid p-0">
-        <h1 className="h3 mb-3">Dashboard Page</h1>
+        <h1 className="h3 mb-3" style={{ fontWeight: "bold" }}>
+          RCS
+        </h1>
         <div className="row">
           <div className="col-12">
             <div className="card">
@@ -247,7 +241,6 @@ const Dashboard = () => {
                         <span style={{ fontWeight: "bold" }}>Division</span>
                       </Form.Label>
                       <Autocomplete
-                        // defaultValue={{ name: "Dhaka", value: "dhaka" }}
                         className="mt-2"
                         onChange={handleDivisionChange}
                         disablePortal
@@ -273,7 +266,6 @@ const Dashboard = () => {
                       </Form.Label>
                       <Autocomplete
                         disabled={false}
-                        // defaultValue={{ name: "Dhaka", value: "dhaka" }}
                         className="mt-2"
                         onChange={handleDistrictChange}
                         disablePortal
@@ -299,7 +291,6 @@ const Dashboard = () => {
                       </Form.Label>
                       <Autocomplete
                         disabled={false}
-                        // defaultValue={{ name: "Dhaka", value: "dhaka" }}
                         className="mt-2"
                         onChange={handleUpazillaChange}
                         disablePortal

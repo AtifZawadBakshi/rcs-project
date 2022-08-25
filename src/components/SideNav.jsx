@@ -1,8 +1,4 @@
-import {
-  DashboardCustomizeOutlined,
-  TextSnippet,
-  ViewList,
-} from "@mui/icons-material";
+import { DashboardCustomizeOutlined, ViewList } from "@mui/icons-material";
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
 const SideNav = () => {
@@ -14,7 +10,13 @@ const SideNav = () => {
   };
 
   return (
-    <nav id="sidebar" className="sidebar js-sidebar">
+    <nav
+      className="sidebar js-sidebar"
+      style={{
+        minHeight: "100vh",
+        overflow: "hidden",
+      }}
+    >
       <div className="sidebar-content js-simplebar">
         <Link
           className="sidebar-brand"
@@ -32,22 +34,21 @@ const SideNav = () => {
           <li className="sidebar-item">
             <NavLink
               className="sidebar-link"
-              to="/"
-              style={({ isActive }) => (isActive ? activeStyle : undefined)}
-            >
-              <DashboardCustomizeOutlined />
-              <span className="align-middle">Dashboard</span>
-            </NavLink>
-          </li>
-
-          <li className="sidebar-item">
-            <NavLink
-              className="sidebar-link"
               to="/cencus-datalist"
               style={({ isActive }) => (isActive ? activeStyle : undefined)}
             >
               <ViewList />
               <span className="align-middle">Cencus Data List</span>
+            </NavLink>
+          </li>
+          <li className="sidebar-item">
+            <NavLink
+              className="sidebar-link"
+              to="/"
+              style={({ isActive }) => (isActive ? activeStyle : undefined)}
+            >
+              <DashboardCustomizeOutlined />
+              <span className="align-middle">RCS</span>
             </NavLink>
           </li>
           {/* <li className="sidebar-item">

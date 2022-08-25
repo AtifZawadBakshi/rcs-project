@@ -84,7 +84,7 @@ const CencusData = () => {
           setOwnerName(response.data.owner_name);
           setStoreSize(response.data.store_size);
           setOwnerNumber(response.data.owner_number);
-          setFelPartner(response.data.fel_partner === 1 ? true : false);
+          setFelPartner(response.data.fel_partner === "1" ? true : false);
           setRetailType(response.data.retail_type);
           setRetail(response.data.retail_name);
           setProductDetails(response.data.enrolled_products);

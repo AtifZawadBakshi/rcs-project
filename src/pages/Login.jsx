@@ -10,6 +10,7 @@ const Login = () => {
   const [userName, setUseName] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+
   const handleSubmit = (event) => {
     event.preventDefault();
     let userDetails = {
@@ -37,30 +38,50 @@ const Login = () => {
           }
         })
         .catch((response) => {
-          toast.error("Invalid User name or Password!", {
-            position: "top-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-          });
+          console.log(response.response.status);
+          toast.error(
+            response.response.status === 0
+              ? "Server Error: Server not found!"
+              : "Invalid Username or Password!",
+            {
+              position: "top-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            }
+          );
         });
     };
     LoginSubmit();
   };
+
   return (
-    <main className="d-flex w-100">
+    <main className="d-flex w-100" style={{ backgroundColor: "#00798C" }}>
       <div className="container d-flex flex-column">
         <div className="row vh-100">
           <div className="col-sm-10 col-md-8 col-lg-6 mx-auto d-table h-100">
             <div className="d-table-cell align-middle">
-              <div className="text-center mt-4">
-                <h1 className="h2">Welcome !</h1>
-                <p className="lead">Sign in to your account to continue</p>
+              <div className="text-center">
+                <h1
+                  className="h1"
+                  style={{ fontWeight: "bold", color: "white" }}
+                >
+                  Welcome !
+                </h1>
+                <p
+                  className="h4"
+                  style={{ fontWeight: "bold", color: "white" }}
+                >
+                  Sign in to your account to continue
+                </p>
               </div>
-              <div className="card">
+              <div
+                className="card m-5"
+                style={{ boxShadow: "-0.02rem 0 3rem #000" }}
+              >
                 <div className="card-body">
                   <div className="m-sm-4">
                     <div className="text-center">
@@ -78,7 +99,7 @@ const Login = () => {
                         >
                           <Form.Label>
                             <span style={{ fontWeight: "bold" }}>
-                              User Name:
+                              Username:
                             </span>
                           </Form.Label>
                           <TextField
@@ -115,11 +136,13 @@ const Login = () => {
                       </div>
 
                       <div className="text-center mt-3">
-                        <button className="btn btn-lg btn-primary">
+                        <button
+                          className="btn btn-lg btn-primary"
+                          style={{ backgroundColor: "#00798C" }}
+                        >
                           Sign in
                         </button>
                         <ToastContainer />
-                        {/* <button type="submit" className="btn btn-lg btn-primary">Sign in</button> */}
                       </div>
                     </form>
                   </div>

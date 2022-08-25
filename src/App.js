@@ -1,5 +1,4 @@
 import { BrowserRouter, Route } from "react-router-dom";
-// import AppNavigation from "./components/AppNavigation";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import SideNav from "./components/SideNav";
