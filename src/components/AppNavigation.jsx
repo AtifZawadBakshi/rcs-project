@@ -9,7 +9,6 @@ import RequireAuth from "../Auth/RequireAuth";
 import PrivateRoutes from "../Auth/PrivateRoutes";
 const AppNavigation = () => {
   let user_details = JSON.parse(localStorage.getItem("login_info"));
-  console.log(user_details);
   let isLoggedIn = false;
   if (user_details != null) {
     isLoggedIn = true;

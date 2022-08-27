@@ -38,7 +38,6 @@ const Login = () => {
           }
         })
         .catch((response) => {
-          console.log(response.response.status);
           toast.error(
             response.response.status === 0
               ? "Server Error: Server not found!"

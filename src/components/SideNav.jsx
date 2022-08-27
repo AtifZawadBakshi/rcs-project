@@ -2,6 +2,7 @@ import { DashboardCustomizeOutlined, ViewList } from "@mui/icons-material";
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
 const SideNav = () => {
+  let user_details = JSON.parse(localStorage.getItem("login_info"));
   let activeStyle = {
     background:
       "linear-gradient(90deg,rgba(59,125,221,.1),rgba(59,125,221,.0875) 50%,transparent)",
@@ -41,16 +42,20 @@ const SideNav = () => {
               <span className="align-middle">Cencus Data List</span>
             </NavLink>
           </li>
-          <li className="sidebar-item">
-            <NavLink
-              className="sidebar-link"
-              to="/"
-              style={({ isActive }) => (isActive ? activeStyle : undefined)}
-            >
-              <DashboardCustomizeOutlined />
-              <span className="align-middle">RCS</span>
-            </NavLink>
-          </li>
+
+          {user_details.isAdmin === false && (
+            <li className="sidebar-item">
+              <NavLink
+                className="sidebar-link"
+                to="/"
+                style={({ isActive }) => (isActive ? activeStyle : undefined)}
+              >
+                <DashboardCustomizeOutlined />
+                <span className="align-middle">RCS</span>
+              </NavLink>
+            </li>
+          )}
+
           {/* <li className="sidebar-item">
             <NavLink
               className="sidebar-link"

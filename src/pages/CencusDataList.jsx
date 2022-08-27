@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
+import { Table as TableA } from "react-bootstrap";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import { Edit, Visibility } from "@mui/icons-material";
+import { Download, Edit, Visibility } from "@mui/icons-material";
 import { Button } from "react-bootstrap";
 import { styled } from "@mui/material/styles";
 import Modal from "react-bootstrap/Modal";
 import { Card } from "@mui/material";
-import { URL, FETCH_DATA } from "../Axios/Api";
+import { URL, FETCH_DATA, EXCEL_DATA } from "../Axios/Api";
 import axios from "axios";
 import { Link, Outlet } from "react-router-dom";
+import { ReactHTMLTabletoExcel } from "react-html-table-to-excel";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -43,11 +45,7 @@ const columns = [
     label: "Retail",
     align: "center",
   },
-  {
-    id: "enrolled-products",
-    label: "Enrolled Products",
-    align: "center",
-  },
+
   {
     id: "actions",
     label: "Actions",
@@ -58,7 +56,6 @@ const columns = [
 const CencusDataList = () => {
   const user_details = JSON.parse(localStorage.getItem("login_info"));
   const accessToken = user_details.access_token || null;
-
   const authAxios = axios.create({
     baseURL: URL,
     headers: {
@@ -71,6 +68,22 @@ const CencusDataList = () => {
   const [modalData, setModalData] = React.useState([]);
   const [submittedData, setSubmittedData] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [modalExcelShow, setModalExcelShow] = React.useState(false);
+  const [modalExccelData, setModalExcelData] = React.useState([]);
+  const modalonExcelClick = async () => {
+    async function fetchData() {
+      const res = await authAxios.get(URL + EXCEL_DATA).then((response) => {
+        console.log(response);
+        setModalExcelData(response.data);
+      });
+    }
+    fetchData();
+    setModalExcelShow(true);
+  };
+  const modalonExcelClose = (event) => {
+    setModalExcelShow(false);
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -91,7 +104,6 @@ const CencusDataList = () => {
     setPage(0);
   };
   const modalonClick = async (event) => {
-    console.log(event);
     setModalData(event);
     setModalShow(true);
   };
@@ -101,9 +113,78 @@ const CencusDataList = () => {
   return (
     <main className="content m-0">
       <div className="container-fluid p-0 m-0">
-        <h1 className="h3 mb-3" style={{ fontWeight: "bold" }}>
-          Cencus Data List
-        </h1>
+        <div className="d-flex justify-content-between align-items-center">
+          <h1 className="h3 mb-3" style={{ fontWeight: "bold" }}>
+            Cencus Data List
+          </h1>
+          {user_details.isAdmin === true && (
+            <button
+              className="btn btn-success mb-3"
+              onClick={modalonExcelClick}
+            >
+              <Download />
+              Export to Excel
+            </button>
+          )}
+        </div>
+        <Modal
+          show={modalExcelShow}
+          onHide={modalonExcelClose}
+          size="xl"
+          centered
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>Excel Download</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <TableA
+              sx={{ textAlign: "center" }}
+              responsive
+              alignitems="center"
+              striped
+              bordered
+              hover
+            >
+              <thead>
+                <tr>
+                  <th align="center">SL No.</th>
+                  <th align="center">Date</th>
+                  <th align="center">Entry Time</th>
+                  <th align="center">Name</th>
+                  <th align="center">Login Code</th>
+                  <th align="center">CSM Name</th>
+                  <th align="center">ASM Name</th>
+                  <th align="center">TSM Name</th>
+                  {/* <th align="center">Division Name</th>
+                      <th align="center">District Name</th>
+                      <th align="center">Upazila/Metro/Town Name</th>
+                      <th align="center">Location Details</th>
+                      <th align="center">Retail Name</th>
+                      <th align="center">Retail Type</th>
+                      <th align="center">Store Size</th> */}
+                </tr>
+              </thead>
+              <tbody>
+                {modalExccelData &&
+                  modalExccelData.map((data, index) => (
+                    <tr key={index}>
+                      <td align="center">{index + 1}</td>
+                      <td align="center">{data.Date}</td>
+                      <td align="center">{data.Entry_Time}</td>
+                      <td align="center">{data.Name}</td>
+                      <td align="center">{data.Login_Code}</td>
+                      <td align="center">{data.CSM}</td>
+                      <td align="center">{data.ASM}</td>
+                      <td align="center">{data.TSM}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </TableA>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onClick={modalonExcelClose}>Close</Button>
+          </Modal.Footer>
+        </Modal>
         <div className="row">
           <div className="col-12">
             <div className="card">
@@ -150,9 +231,7 @@ const CencusDataList = () => {
                                   <TableCell align="center">
                                     {data.retail_name}
                                   </TableCell>
-                                  <TableCell align="center">
-                                    {data.enrolled_products.length}
-                                  </TableCell>
+
                                   <TableCell align="center">
                                     <div className="d-flex justify-content-around align-content-center">
                                       <Button
@@ -165,14 +244,16 @@ const CencusDataList = () => {
                                         <Visibility />
                                         Show
                                       </Button>
-                                      <Link
-                                        to={`/cencus-datalist/${data.transId}`}
-                                      >
-                                        <Button variant="warning">
-                                          <Edit />
-                                          Edit
-                                        </Button>
-                                      </Link>
+                                      {user_details.isAdmin === false && (
+                                        <Link
+                                          to={`/cencus-datalist/${data.transId}`}
+                                        >
+                                          <Button variant="warning">
+                                            <Edit />
+                                            Edit
+                                          </Button>
+                                        </Link>
+                                      )}
                                     </div>
                                   </TableCell>
                                 </TableRow>
@@ -265,7 +346,7 @@ const CencusDataList = () => {
                                     <tr>
                                       <th align="right">Store Size:</th>
                                       <td align="left">
-                                        {modalData.store_size} sqft
+                                        {modalData.store_size}
                                       </td>
                                     </tr>
                                     <tr>
@@ -276,6 +357,14 @@ const CencusDataList = () => {
                                           : "No"}
                                       </td>
                                     </tr>
+                                    {modalData.fel_partner === "1" && (
+                                      <tr>
+                                        <th align="right">DMS Code:</th>
+                                        <td align="left">
+                                          {modalData.dmscode}
+                                        </td>
+                                      </tr>
+                                    )}
                                     <tr>
                                       <th align="right">Owner:</th>
                                       <td align="left">

@@ -3,13 +3,7 @@ import { Form, Button } from "react-bootstrap";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { MenuItem, Select, InputLabel, FormControl } from "@mui/material";
-import {
-  Save,
-  AddCircle,
-  Delete,
-  SystemUpdateAlt,
-  CancelPresentation,
-} from "@mui/icons-material";
+import { SystemUpdateAlt, CancelPresentation } from "@mui/icons-material";
 import { categoryList, brandList } from "../demoData";
 import divisionList from "../demoData";
 import { ToastContainer, toast } from "react-toastify";
@@ -36,12 +30,37 @@ const CencusData = () => {
       Authorization: `Bearer ${accessToken}`,
     },
   });
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  const getDistrictDefault = async (district) => {
+    await authAxios
+      .post(URL + GET_DISTRICT, { id: district.Division_ID })
+      .then((response) => setDistrictOptions(response.data.districtList));
+  };
+  const getUpazilaDefault = async (upazila) => {
+    await authAxios
+      .post(URL + GET_UPAZILA, {
+        id: upazila.District_ID,
+      })
+      .then((response) => setUpazillaOptions(response.data.upazilaList));
+  };
+
+  // const subcategoryDefaultOptions = async (product) => {
+  //   await authAxios
+  //     .post(URL + GET_SUBCATEGORY, {
+  //       id: product.category,
+  //     })
+  //     .then((response) => {
+  //       console.log(response.data.subCategoryList);
+  //       let temp = [...subcategoryOptions, response.data.subCategoryList];
+  //       setSubcategoryOptions(temp);
+  //       delay(5000);
+  //     });
+  // };
 
   const [defaultDivisonValue, setDefaultDivisonValue] = useState("");
   const [defaultDistrictValue, setDefaultDistrictValue] = useState("");
   const [defaultUpazilaValue, setDefaultUpazilaValue] = useState("");
-  const [defaultCategoryValue, setDefaultCategoryValue] = useState("");
-  const [defaultSubcategoryValue, setDefaultSubcategoryValue] = useState("");
   const [division, setDivision] = useState(0);
   const [district, setDistrict] = useState(0);
   const [districtOptions, setDistrictOptions] = useState([]);
@@ -52,14 +71,13 @@ const CencusData = () => {
   const [retailType, setRetailType] = useState("");
   const [storeSize, setStoreSize] = useState("");
   const [felPartner, setFelPartner] = useState(false);
+  const [dmsCode, setDmsCode] = useState("");
   const [ownerName, setOwnerName] = useState("");
   const [ownerNumber, setOwnerNumber] = useState("");
   const [csm, setCsm] = useState("");
   const [asm, setAsm] = useState("");
   const [tsm, settsm] = useState("");
   const [subcategoryOptions, setSubcategoryOptions] = useState([]);
-  const [subcategory, setSubcategory] = useState([{ subcategory_name: "" }]);
-  const [dataList, setDataList] = useState([]);
   const [productDetails, setProductDetails] = useState([]);
   const [loading, setLoading] = useState(false);
   let { cencusID } = useParams();
@@ -70,12 +88,13 @@ const CencusData = () => {
         .get(URL + UPDATE_DATA + "/" + cencusID)
         .then((response) => {
           console.log(response.data);
-          setDataList(response.data);
           setDivision(response.data.division.Division_ID);
           setDistrict(response.data.district.District_ID);
           setUpazila(response.data.upazila.Upazila_ID);
           setDefaultDivisonValue(response.data.division);
+          getDistrictDefault(response.data.division);
           setDefaultDistrictValue(response.data.district);
+          getUpazilaDefault(response.data.district);
           setDefaultUpazilaValue(response.data.upazila);
           setCsm(response.data.csm_name);
           setAsm(response.data.asm_name);
@@ -85,9 +104,15 @@ const CencusData = () => {
           setStoreSize(response.data.store_size);
           setOwnerNumber(response.data.owner_number);
           setFelPartner(response.data.fel_partner === "1" ? true : false);
+          setDmsCode(response.data.dmscode);
           setRetailType(response.data.retail_type);
           setRetail(response.data.retail_name);
           setProductDetails(response.data.enrolled_products);
+
+          // response.data.enrolled_products.map((product) =>
+          //   subcategoryDefaultOptions(product)
+          // );
+
           setLoading(true);
         });
     }
@@ -198,6 +223,7 @@ const CencusData = () => {
       retail_type: retailType,
       store_size: storeSize,
       fel_partner: felPartner,
+      dms_code: dmsCode,
       owner_name: ownerName,
       owner_number: ownerNumber,
       csm: csm,
@@ -218,7 +244,6 @@ const CencusData = () => {
     }).then((result) => {
       if (result.isConfirmed) {
         submitData();
-        console.log("DATA SUBMITTED");
         navigate(-1);
         toast.success("Successfully Updated!", {
           position: "top-right",
@@ -235,7 +260,7 @@ const CencusData = () => {
   return (
     <main className="content">
       <div className="container-fluid p-0">
-        <h1 className="h3 mb-3">CENCUS DATA DETAILS {cencusID} </h1>
+        <h1 className="h3 mb-3">CENCUS DATA DETAILS</h1>
         <div className="row">
           <div className="col-12">
             <div className="card">
@@ -296,7 +321,10 @@ const CencusData = () => {
                         controlId="exampleForm.ControlInput1"
                       >
                         <Form.Label>
-                          <span style={{ fontWeight: "bold" }}> Upazila</span>
+                          <span style={{ fontWeight: "bold" }}>
+                            {" "}
+                            Upazila/Metro/Town
+                          </span>
                         </Form.Label>
                         <Autocomplete
                           disabled={false}
@@ -323,7 +351,7 @@ const CencusData = () => {
                       >
                         <Form.Label>
                           <span style={{ fontWeight: "bold" }}>
-                            City/Town/Village
+                            Location Details
                           </span>
                         </Form.Label>
                         <div>
@@ -363,6 +391,33 @@ const CencusData = () => {
                         className="mb-4"
                         controlId="exampleForm.ControlInput1"
                       >
+                        <Form.Label id="demo-simple-select-label">
+                          <span style={{ fontWeight: "bold" }}>
+                            Retail Type
+                          </span>
+                        </Form.Label>
+
+                        <FormControl className="mt-2" fullWidth>
+                          <InputLabel id="demo-simple-select-label">
+                            Choose retail type
+                          </InputLabel>
+                          <Select
+                            required={true}
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            label="Choose retail type"
+                            value={retailType}
+                            onChange={(e) => setRetailType(e.target.value)}
+                          >
+                            <MenuItem value="Brand Shop">Brand Shop</MenuItem>
+                            <MenuItem value="MBO">MBO</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Form.Group>
+                      {/* <Form.Group
+                        className="mb-4"
+                        controlId="exampleForm.ControlInput1"
+                      >
                         <Form.Label>
                           <span style={{ fontWeight: "bold" }}>
                             Retail Type
@@ -378,29 +433,47 @@ const CencusData = () => {
                             onChange={(e) => setRetailType(e.target.value)}
                           />
                         </div>
-                      </Form.Group>
+                      </Form.Group> */}
                     </div>
                     <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-4	col-xxl-4">
                       <Form.Group
                         className="mb-4"
                         controlId="exampleForm.ControlInput1"
                       >
-                        <Form.Label>
+                        <Form.Label id="demo-simple-select-label">
                           <span style={{ fontWeight: "bold" }}>
-                            {" "}
-                            Store Size
+                            Store Size (SQFT)
                           </span>
                         </Form.Label>
-                        <div>
-                          <TextField
-                            fullWidth
+
+                        <FormControl className="mt-2" fullWidth>
+                          <InputLabel id="demo-simple-select-label">
+                            Choose store size
+                          </InputLabel>
+                          <Select
                             required={true}
-                            className="mt-2"
-                            label="Enter retail type"
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            label="Choose store size"
                             value={storeSize}
-                            onChange={(e) => setStoreSize(e.target.value)}
-                          />
-                        </div>
+                            onChange={(event) => {
+                              setStoreSize(event.target.value);
+                            }}
+                          >
+                            <MenuItem value="< 1000 sq ft">
+                              {"<"} 1000 sq ft
+                            </MenuItem>
+                            <MenuItem value="1000-2000 sq ft">
+                              1000-2000 sq ft
+                            </MenuItem>
+                            <MenuItem value="2000-3500 sq ft">
+                              2000-3500 sq ft
+                            </MenuItem>
+                            <MenuItem value="> 3500sq sq ft">
+                              {">"} 3500 sq ft
+                            </MenuItem>
+                          </Select>
+                        </FormControl>
                       </Form.Group>
                     </div>
                     <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-4	col-xxl-4">
@@ -434,6 +507,30 @@ const CencusData = () => {
                         </FormControl>
                       </Form.Group>
                     </div>
+
+                    {felPartner ? (
+                      <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-4	col-xxl-4">
+                        <Form.Group
+                          className="mb-4"
+                          controlId="exampleForm.ControlInput1"
+                        >
+                          <Form.Label id="demo-simple-select-label">
+                            <span style={{ fontWeight: "bold" }}>DMS Code</span>
+                          </Form.Label>
+
+                          <TextField
+                            required={true}
+                            fullWidth
+                            className="mt-2"
+                            label="Enter DMS code"
+                            value={dmsCode}
+                            onChange={(e) => setDmsCode(e.target.value)}
+                          />
+                        </Form.Group>
+                      </div>
+                    ) : (
+                      <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-4	col-xxl-4"></div>
+                    )}
                     <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-4	col-xxl-4">
                       <Form.Group
                         className="mb-4"
@@ -585,6 +682,7 @@ const CencusData = () => {
                             </Form.Group>
                           </div>
                         </div>
+
                         <div className="col-12	col-sm-12	col-md-6	col-lg-5	col-xl-6	col-xxl-6 ">
                           <div className=" row d-flex justify-content-between align-items-center">
                             <Form.Label className="col-4">

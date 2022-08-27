@@ -11,7 +11,6 @@ import CencusDataList from "./pages/CencusDataList";
 import CencusData from "./pages/CencusData";
 function App() {
   let user_details = JSON.parse(localStorage.getItem("login_info")) || null;
-  console.log(user_details);
   let isLoggedIn = false;
   if (user_details != null) {
     isLoggedIn = true;
@@ -27,7 +26,17 @@ function App() {
             <Header />
             <Routes>
               <Route element={<PrivateRoutes isLoggedIn={isLoggedIn} />}>
-                <Route path="/" element={<Dashboard />} exact />
+                <Route
+                  path="/"
+                  element={
+                    user_details.isAdmin === false ? (
+                      <Dashboard />
+                    ) : (
+                      <CencusDataList />
+                    )
+                  }
+                  exact
+                />
                 <Route path="cencus-datalist" element={<CencusDataList />} />
                 <Route
                   path="cencus-datalist/:cencusID"

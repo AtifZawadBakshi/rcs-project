@@ -37,14 +37,15 @@ const Dashboard = () => {
   const [retail, setRetail] = useState("");
   const [retailType, setRetailType] = useState("");
   const [storeSize, setStoreSize] = useState("");
-  const [felPartner, setFelPartner] = useState("");
+  const [dmsCode, setDmsCode] = useState("");
+  const [felPartner, setFelPartner] = useState(false);
   const [ownerName, setOwnerName] = useState("");
   const [ownerNumber, setOwnerNumber] = useState("");
   const [csm, setCsm] = useState(user_details.userInfo.CSM_Name);
   const [asm, setAsm] = useState(user_details.userInfo.ASM_Name);
   const [tsm, settsm] = useState(user_details.userInfo.TSM_Name);
-  const [subcategoryOptions, setSubcategoryOptions] = useState([]);
-  const [subcategory, setSubcategory] = useState([{ subcategory_name: "" }]);
+  const [subcategoryOptions, setSubcategoryOptions] = useState([[]]);
+
   const [productDetails, setProductDetails] = useState([
     {
       category_id: 0,
@@ -103,15 +104,16 @@ const Dashboard = () => {
         .post(URL + GET_SUBCATEGORY, {
           id: categoryid,
         })
-        .then((response) =>
-          setSubcategoryOptions(response.data.subCategoryList)
-        );
+        .then((response) => {
+          const temp = [...subcategoryOptions];
+          temp[index] = response.data.subCategoryList;
+          setSubcategoryOptions(temp);
+        });
     };
     getSubcategoryList();
   };
   const handleSubcategoryChange = (index, event) => {
     const values = [...productDetails];
-    console.log(event.target);
     values[index]["subcategory_id"] = event.target.value;
     setProductDetails(values);
   };
@@ -121,7 +123,7 @@ const Dashboard = () => {
     setProductDetails(values);
   };
   const handleAddButton = () => {
-    setSubcategory([...subcategory, { subcategory_name: "" }]);
+    setSubcategoryOptions([...subcategoryOptions, []]);
     setProductDetails([
       ...productDetails,
       {
@@ -191,6 +193,7 @@ const Dashboard = () => {
       retail_type: retailType,
       store_size: storeSize,
       fel_partner: felPartner,
+      dms_code: dmsCode,
       owner_name: ownerName,
       owner_number: ownerNumber,
       csm: csm,
@@ -287,7 +290,9 @@ const Dashboard = () => {
                       controlId="exampleForm.ControlInput1"
                     >
                       <Form.Label>
-                        <span style={{ fontWeight: "bold" }}> Upazila</span>
+                        <span style={{ fontWeight: "bold" }}>
+                          Upazila/Metro/Town
+                        </span>
                       </Form.Label>
                       <Autocomplete
                         disabled={false}
@@ -313,7 +318,7 @@ const Dashboard = () => {
                     >
                       <Form.Label>
                         <span style={{ fontWeight: "bold" }}>
-                          City/Town/Village
+                          Location Details
                         </span>
                       </Form.Label>
                       <div>
@@ -353,6 +358,31 @@ const Dashboard = () => {
                       className="mb-4"
                       controlId="exampleForm.ControlInput1"
                     >
+                      <Form.Label id="demo-simple-select-label">
+                        <span style={{ fontWeight: "bold" }}>Retail Type</span>
+                      </Form.Label>
+
+                      <FormControl className="mt-2" fullWidth>
+                        <InputLabel id="demo-simple-select-label">
+                          Choose retail type
+                        </InputLabel>
+                        <Select
+                          required={true}
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          label="Choose retail type"
+                          value={retailType}
+                          onChange={(e) => setRetailType(e.target.value)}
+                        >
+                          <MenuItem value="Brand Shop">Brand Shop</MenuItem>
+                          <MenuItem value="MBO">MBO</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Form.Group>
+                    {/* <Form.Group
+                      className="mb-4"
+                      controlId="exampleForm.ControlInput1"
+                    >
                       <Form.Label>
                         <span style={{ fontWeight: "bold" }}>Retail Type</span>
                       </Form.Label>
@@ -366,15 +396,54 @@ const Dashboard = () => {
                           onChange={(e) => setRetailType(e.target.value)}
                         />
                       </div>
-                    </Form.Group>
+                    </Form.Group> */}
                   </div>
                   <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-4	col-xxl-4">
                     <Form.Group
                       className="mb-4"
                       controlId="exampleForm.ControlInput1"
                     >
+                      <Form.Label id="demo-simple-select-label">
+                        <span style={{ fontWeight: "bold" }}>
+                          Store Size (SQFT)
+                        </span>
+                      </Form.Label>
+
+                      <FormControl className="mt-2" fullWidth>
+                        <InputLabel id="demo-simple-select-label">
+                          Choose store size
+                        </InputLabel>
+                        <Select
+                          required={true}
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          label="Choose store size"
+                          value={storeSize}
+                          onChange={(event) => {
+                            setStoreSize(event.target.value);
+                          }}
+                        >
+                          <MenuItem value="< 1000 sq ft">
+                            {"<"} 1000 sq ft
+                          </MenuItem>
+                          <MenuItem value="1000-2000 sq ft">
+                            1000-2000 sq ft
+                          </MenuItem>
+                          <MenuItem value="2000-3500 sq ft">
+                            2000-3500 sq ft
+                          </MenuItem>
+                          <MenuItem value="> 3500sq sq ft">
+                            {">"} 3500 sq ft
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Form.Group>
+                    {/* <Form.Group
+                      className="mb-4"
+                      controlId="exampleForm.ControlInput1"
+                    >
                       <Form.Label>
-                        <span style={{ fontWeight: "bold" }}> Store Size</span>
+                        <span style={{ fontWeight: "bold" }}>Store Size</span>
                       </Form.Label>
                       <div>
                         <TextField
@@ -386,7 +455,7 @@ const Dashboard = () => {
                           onChange={(e) => setStoreSize(e.target.value)}
                         />
                       </div>
-                    </Form.Group>
+                    </Form.Group> */}
                   </div>
                   <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-4	col-xxl-4">
                     <Form.Group
@@ -417,6 +486,29 @@ const Dashboard = () => {
                       </FormControl>
                     </Form.Group>
                   </div>
+                  {felPartner ? (
+                    <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-4	col-xxl-4">
+                      <Form.Group
+                        className="mb-4"
+                        controlId="exampleForm.ControlInput1"
+                      >
+                        <Form.Label id="demo-simple-select-label">
+                          <span style={{ fontWeight: "bold" }}>DMS Code</span>
+                        </Form.Label>
+
+                        <TextField
+                          required={true}
+                          fullWidth
+                          className="mt-2"
+                          label="Enter DMS code"
+                          value={dmsCode}
+                          onChange={(e) => setDmsCode(e.target.value)}
+                        />
+                      </Form.Group>
+                    </div>
+                  ) : (
+                    <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-4	col-xxl-4"></div>
+                  )}
                   <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-4	col-xxl-4">
                     <Form.Group
                       className="mb-4"
@@ -586,12 +678,11 @@ const Dashboard = () => {
                                 labelId="demo-simple-select-label"
                                 id="demo-simple-select"
                                 label="Choose a subcategory"
-                                // value={subcategory[index].subcategory_name}
                                 onChange={(event) => {
                                   handleSubcategoryChange(index, event);
                                 }}
                               >
-                                {subcategoryOptions.length === 0 ? (
+                                {subcategoryOptions[index].length === 0 ? (
                                   <MenuItem value="">
                                     <em>No options</em>
                                   </MenuItem>
@@ -601,15 +692,17 @@ const Dashboard = () => {
                                   </MenuItem>
                                 )}
 
-                                {subcategoryOptions.map((option, index) => (
-                                  <MenuItem
-                                    key={option.Sub_Cat_ID}
-                                    value={option.Sub_Cat_ID}
-                                    name={option.Sub_Cat_Name}
-                                  >
-                                    {option.Sub_Category_Name}
-                                  </MenuItem>
-                                ))}
+                                {subcategoryOptions[index].map(
+                                  (option, index) => (
+                                    <MenuItem
+                                      key={option.Sub_Cat_ID}
+                                      value={option.Sub_Cat_ID}
+                                      name={option.Sub_Cat_Name}
+                                    >
+                                      {option.Sub_Category_Name}
+                                    </MenuItem>
+                                  )
+                                )}
                               </Select>
                             </FormControl>
                           </Form.Group>
