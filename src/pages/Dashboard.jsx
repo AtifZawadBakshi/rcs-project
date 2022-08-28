@@ -540,6 +540,7 @@ const Dashboard = () => {
                         fullWidth
                         className="mt-2"
                         type="number"
+                        inputProps={{ maxLength: 11 }}
                         label="Enter owner number"
                         value={ownerNumber}
                         onChange={(e) => setOwnerNumber(e.target.value)}

@@ -16,7 +16,7 @@ import { Card } from "@mui/material";
 import { URL, FETCH_DATA, EXCEL_DATA } from "../Axios/Api";
 import axios from "axios";
 import { Link, Outlet } from "react-router-dom";
-import { ReactHTMLTabletoExcel } from "react-html-table-to-excel";
+import { XLSX } from "xlsx";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
@@ -37,7 +37,7 @@ const columns = [
   },
   {
     id: "upazila",
-    label: "Upazila",
+    label: "Upazila/Metro/Town",
     align: "center",
   },
   {
@@ -68,7 +68,6 @@ const CencusDataList = () => {
   const [modalData, setModalData] = React.useState([]);
   const [submittedData, setSubmittedData] = useState([]);
   const [loading, setLoading] = useState(false);
-
   const [modalExcelShow, setModalExcelShow] = React.useState(false);
   const [modalExccelData, setModalExcelData] = React.useState([]);
   const modalonExcelClick = async () => {
@@ -84,7 +83,13 @@ const CencusDataList = () => {
   const modalonExcelClose = (event) => {
     setModalExcelShow(false);
   };
-
+  const modalonExcelProceed = () => {
+    var XLSX = require("xlsx");
+    var wb = XLSX.utils.book_new();
+    var ws = XLSX.utils.json_to_sheet(modalExccelData);
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    XLSX.writeFile(wb, "RCSDataSheet.xlsx");
+  };
   useEffect(() => {
     async function fetchData() {
       const res = await authAxios.get(URL + FETCH_DATA).then((response) => {
@@ -117,15 +122,11 @@ const CencusDataList = () => {
           <h1 className="h3 mb-3" style={{ fontWeight: "bold" }}>
             Cencus Data List
           </h1>
-          {user_details.isAdmin === true && (
-            <button
-              className="btn btn-success mb-3"
-              onClick={modalonExcelClick}
-            >
-              <Download />
-              Export to Excel
-            </button>
-          )}
+
+          <button className="btn btn-success mb-3" onClick={modalonExcelClick}>
+            <Download />
+            Export to Excel
+          </button>
         </div>
         <Modal
           show={modalExcelShow}
@@ -134,7 +135,9 @@ const CencusDataList = () => {
           centered
         >
           <Modal.Header closeButton>
-            <Modal.Title>Excel Download</Modal.Title>
+            <Button variant="success" onClick={modalonExcelProceed}>
+              <Download /> Proceed Download
+            </Button>
           </Modal.Header>
           <Modal.Body>
             <TableA
@@ -155,13 +158,34 @@ const CencusDataList = () => {
                   <th align="center">CSM Name</th>
                   <th align="center">ASM Name</th>
                   <th align="center">TSM Name</th>
-                  {/* <th align="center">Division Name</th>
-                      <th align="center">District Name</th>
-                      <th align="center">Upazila/Metro/Town Name</th>
-                      <th align="center">Location Details</th>
-                      <th align="center">Retail Name</th>
-                      <th align="center">Retail Type</th>
-                      <th align="center">Store Size</th> */}
+                  <th align="center">Division Name</th>
+                  <th align="center">District Name</th>
+                  <th align="center">Upazila/Metro/Town Name</th>
+                  <th align="center">Location Details</th>
+                  <th align="center">Retail Name</th>
+                  <th align="center">Retail Type</th>
+                  <th align="center">Store Size</th>
+                  <th align="center">Fel Partner </th>
+                  <th align="center">DMS Code</th>
+                  <th align="center">Owner Name</th>
+                  <th align="center">Owner Number</th>
+                  <th align="center">Category Name</th>
+                  <th align="center">Subcategory Name</th>
+                  <th align="center">Samsung QNTY</th>
+                  <th align="center">Sony QNTY</th>
+                  <th align="center">LG QNTY</th>
+                  <th align="center">OTH Foreign QNTY</th>
+                  <th align="center">Walton QNTY</th>
+                  <th align="center">Singer QNTY</th>
+                  <th align="center">Sharp QNTY</th>
+                  <th align="center">Vision QNTY</th>
+                  <th align="center">Eco Plus QNTY</th>
+                  <th align="center">Miyako QNTY</th>
+                  <th align="center">Gree QNTY</th>
+                  <th align="center">Midea QNTY</th>
+                  <th align="center">OTH BD Foreign QNTY</th>
+                  <th align="center">Hitachi QNTY</th>
+                  <th align="center">Jamuna QNTY</th>
                 </tr>
               </thead>
               <tbody>
@@ -176,12 +200,43 @@ const CencusDataList = () => {
                       <td align="center">{data.CSM}</td>
                       <td align="center">{data.ASM}</td>
                       <td align="center">{data.TSM}</td>
+                      <td align="center">{data.Division_Name}</td>
+                      <td align="center">{data.District_Name}</td>
+                      <td align="center">{data.Upazila_Name}</td>
+                      <td align="center">{data.City_Town_Village}</td>
+                      <td align="center">{data.Retail_Name}</td>
+                      <td align="center">{data.Retail_Type}</td>
+                      <td align="center">{data.Store_Size}</td>
+                      <td align="center">{data.Fel_Partner}</td>
+                      <td align="center">{data.DMS_Code}</td>
+                      <td align="center">{data.Owner_Name}</td>
+                      <td align="center">{data.Owner_Mobile}</td>
+                      <td align="center">{data.Category_Name}</td>
+                      <td align="center">{data.Sub_Category_Name}</td>
+                      <td align="center">{data.SAMSUNG_Brand}</td>
+                      <td align="center">{data.SONY_Brand}</td>
+                      <td align="center">{data.LG_Brand}</td>
+                      <td align="center">{data.OTH_FOREIGN_Brand}</td>
+                      <td align="center">{data.WALTON_Brand}</td>
+                      <td align="center">{data.SINGER_Brand}</td>
+                      <td align="center">{data.SHARP_Brand}</td>
+                      <td align="center">{data.VISION_Brand}</td>
+                      <td align="center">{data.ECO_PLUS_Brand}</td>
+                      <td align="center">{data.MIYAKO_Brand}</td>
+                      <td align="center">{data.GREE_Brand}</td>
+                      <td align="center">{data.MIDEA_Brand}</td>
+                      <td align="center">{data.OTH_FOREIGN_Brand}</td>
+                      <td align="center">{data.HITACHI}</td>
+                      <td align="center">{data.JAMUNA}</td>
                     </tr>
                   ))}
               </tbody>
             </TableA>
           </Modal.Body>
           <Modal.Footer>
+            <Button variant="success" onClick={modalonExcelProceed}>
+              <Download /> Proceed Download
+            </Button>
             <Button onClick={modalonExcelClose}>Close</Button>
           </Modal.Footer>
         </Modal>
@@ -281,77 +336,69 @@ const CencusDataList = () => {
                               </h5>
                             </div>
 
-                            <div className="row d-flex justify-content-center align-items-center">
-                              <div className="col-5">
-                                <Table
-                                  sx={{ textAlign: "center" }}
-                                  responsive
-                                  alignitems="center"
-                                >
+                            <div className="container row d-flex justify-content-around align-items-center">
+                              <div className="col">
+                                <TableA sx={{ textAlign: "center" }} responsive>
                                   <tbody>
                                     <tr>
-                                      <th align="right">Division:</th>
-                                      <td align="left">
+                                      <th>Division:</th>
+                                      <td style={{ textAlign: "left" }}>
                                         {modalData.division.Division_Name}
                                       </td>
                                     </tr>
                                     <tr>
-                                      <th align="right">District:</th>
-                                      <td align="left">
+                                      <th>District:</th>
+                                      <td style={{ textAlign: "left" }}>
                                         {modalData.district.District_Name}
                                       </td>
                                     </tr>
                                     <tr>
-                                      <th align="right">Upazila:</th>
-                                      <td align="left">
+                                      <th>Upazila/Metro/Town:</th>
+                                      <td style={{ textAlign: "left" }}>
                                         {modalData.upazila.Upazila_Name}
                                       </td>
                                     </tr>
                                     <tr>
-                                      <th align="right">Location Details:</th>
-                                      <td align="left">
+                                      <th>Location Details:</th>
+                                      <td style={{ textAlign: "left" }}>
                                         {modalData.location_details}
                                       </td>
                                     </tr>
                                     <tr>
-                                      <th align="right">Retail Name:</th>
-                                      <td align="left">
+                                      <th>Retail Name:</th>
+                                      <td style={{ textAlign: "left" }}>
                                         {modalData.retail_name}
                                       </td>
                                     </tr>
                                     <tr>
-                                      <th align="right">Retail Type:</th>
-                                      <td align="left">
+                                      <th>Retail Type:</th>
+                                      <td style={{ textAlign: "left" }}>
                                         {modalData.retail_type}
                                       </td>
                                     </tr>
+                                  </tbody>
+                                </TableA>
+                              </div>
+                              <div className="col">
+                                <TableA sx={{ textAlign: "center" }} responsive>
+                                  <tbody>
                                     <tr>
-                                      <th align="right">Date & Time:</th>
-                                      <td align="left">
+                                      <th>Date & Time:</th>
+                                      <td style={{ textAlign: "left" }}>
                                         {modalData.created_date +
                                           " " +
                                           modalData.created_time}
                                       </td>
                                     </tr>
-                                  </tbody>
-                                </Table>
-                              </div>
-                              <div className="col-3">
-                                <Table
-                                  sx={{ textAlign: "center" }}
-                                  responsive
-                                  alignitems="center"
-                                >
-                                  <tbody>
                                     <tr>
-                                      <th align="right">Store Size:</th>
-                                      <td align="left">
+                                      <th>Store Size:</th>
+                                      <td style={{ textAlign: "left" }}>
                                         {modalData.store_size}
                                       </td>
                                     </tr>
                                     <tr>
-                                      <th align="right">FEL Partner:</th>
-                                      <td align="left">
+                                      <th>FEL Partner:</th>
+                                      <td style={{ textAlign: "left" }}>
                                         {modalData.fel_partner === "1"
                                           ? "Yes"
                                           : "No"}
@@ -359,39 +406,49 @@ const CencusDataList = () => {
                                     </tr>
                                     {modalData.fel_partner === "1" && (
                                       <tr>
-                                        <th align="right">DMS Code:</th>
-                                        <td align="left">
+                                        <th>DMS Code:</th>
+                                        <td style={{ textAlign: "left" }}>
                                           {modalData.dmscode}
                                         </td>
                                       </tr>
                                     )}
                                     <tr>
-                                      <th align="right">Owner:</th>
-                                      <td align="left">
+                                      <th>Owner:</th>
+                                      <td style={{ textAlign: "left" }}>
                                         {modalData.owner_name}
                                       </td>
                                     </tr>
                                     <tr>
-                                      <th align="right">Number:</th>
-                                      <td align="left">
+                                      <th>Number:</th>
+                                      <td style={{ textAlign: "left" }}>
                                         {modalData.owner_number}
                                       </td>
                                     </tr>
-                                    <tr>
-                                      <th align="right">CSM Name:</th>
-                                      <td align="left">{modalData.csm_name}</td>
-                                    </tr>
-                                    <tr>
-                                      <th align="right">ASM Name:</th>
-                                      <td align="left">{modalData.asm_name}</td>
-                                    </tr>
-                                    <tr>
-                                      <th align="right">TSM Name:</th>
-                                      <td align="left">{modalData.tsm_name}</td>
-                                    </tr>
                                   </tbody>
-                                </Table>
+                                </TableA>
                               </div>
+                            </div>
+                            <div className="row my-2">
+                              <TableA
+                                responsive
+                                striped
+                                bordered
+                                hover
+                                size="sm"
+                                sx={{ textAlign: "center" }}
+                                alignitems="center"
+                              >
+                                <tbody>
+                                  <tr>
+                                    <th>CSM Name:</th>
+                                    <td>{modalData.csm_name}</td>
+                                    <th>ASM Name:</th>
+                                    <td>{modalData.asm_name}</td>
+                                    <th>TSM Name:</th>
+                                    <td>{modalData.tsm_name}</td>
+                                  </tr>
+                                </tbody>
+                              </TableA>
                             </div>
                             <div className="row my-2">
                               <h6 className="text-center">
@@ -407,9 +464,14 @@ const CencusDataList = () => {
                                         boxShadow: "0.01rem 0 0.5rem #000",
                                       }}
                                     >
-                                      <Table
+                                      <TableA
+                                        striped
+                                        bordered
+                                        hover
+                                        size="sm"
                                         sx={{
                                           textAlign: "center",
+
                                           marginTop: 2,
                                         }}
                                         responsive
@@ -430,8 +492,8 @@ const CencusDataList = () => {
                                             </td>
                                           </tr>
                                         </tbody>
-                                      </Table>
-                                      <Table
+                                      </TableA>
+                                      <TableA
                                         sx={{
                                           textAlign: "center",
                                           marginTop: 2,
@@ -442,91 +504,89 @@ const CencusDataList = () => {
                                       >
                                         <tbody>
                                           <tr>
-                                            <th align="center">Brand Name</th>
-                                            <th align="left">Quantity</th>
-                                            <th align="center">Brand Name</th>
-                                            <th align="left">Quantity</th>
+                                            <th>Brand Name</th>
+                                            <th>Quantity</th>
+                                            <th>Brand Name</th>
+                                            <th>Quantity</th>
                                           </tr>
                                           <tr>
-                                            <td align="center">SAMSUNG</td>
-                                            <td align="center">
+                                            <td>SAMSUNG</td>
+                                            <td style={{ textAlign: "center" }}>
                                               {product.samsumg_brand}
                                             </td>
-                                            <td align="center">SONY</td>
-                                            <td align="center">
+                                            <td>SONY</td>
+                                            <td style={{ textAlign: "center" }}>
                                               {product.sony_brand}
                                             </td>
                                           </tr>
                                           <tr>
-                                            <td align="center">LG</td>
-                                            <td align="center">
+                                            <td>LG</td>
+                                            <td style={{ textAlign: "center" }}>
                                               {product.lg_brand}
                                             </td>
-                                            <td align="center">
-                                              OTH - FOREIGN
-                                            </td>
-                                            <td align="center">
+                                            <td>OTH - FOREIGN</td>
+                                            <td style={{ textAlign: "center" }}>
                                               {product.oth_foreign_brand}
                                             </td>
                                           </tr>
                                           <tr>
-                                            <td align="center">WALTON</td>
-                                            <td align="center">
+                                            <td>WALTON</td>
+                                            <td style={{ textAlign: "center" }}>
                                               {product.walton_brand}
                                             </td>
-                                            <td align="center">SINGER</td>
-                                            <td align="center">
+                                            <td>SINGER</td>
+                                            <td style={{ textAlign: "center" }}>
                                               {product.singer_brand}
                                             </td>
                                           </tr>
                                           <tr>
-                                            <td align="center">MIDEA</td>
-                                            <td align="center">
+                                            <td>MIDEA</td>
+                                            <td style={{ textAlign: "center" }}>
                                               {product.midea_brand}
                                             </td>
-                                            <td align="center">VISION</td>
-                                            <td align="center">
+                                            <td>VISION</td>
+                                            <td style={{ textAlign: "center" }}>
                                               {product.vision_brand}
                                             </td>
                                           </tr>
                                           <tr>
-                                            <td align="center">OTH-BD</td>
-                                            <td align="center">
+                                            <td>OTH-BD</td>
+                                            <td style={{ textAlign: "center" }}>
                                               {product.oth_bd_brand}
                                             </td>
-                                            <td align="center">HITACHI</td>
-                                            <td align="center">
+                                            <td>HITACHI</td>
+                                            <td style={{ textAlign: "center" }}>
                                               {product.hitachi_brand}
                                             </td>
                                           </tr>
                                           <tr>
-                                            <td align="center">JAMUNA</td>
-                                            <td align="center">
+                                            <td>JAMUNA</td>
+                                            <td style={{ textAlign: "center" }}>
                                               {product.jamuna_brand}
                                             </td>
-                                            <td align="center">SHARP</td>
-                                            <td align="center">
+                                            <td>SHARP</td>
+                                            <td style={{ textAlign: "center" }}>
                                               {product.sharp_brand}
                                             </td>
                                           </tr>
                                           <tr>
-                                            <td align="center">ECO PLUS</td>
-                                            <td align="center">
+                                            <td>ECO PLUS</td>
+                                            <td style={{ textAlign: "center" }}>
                                               {product.eco_plus_brand}
                                             </td>
-                                            <td align="center">MIYAKO</td>
-                                            <td align="center">
+                                            <td>MIYAKO</td>
+                                            <td style={{ textAlign: "center" }}>
                                               {product.miyako_brand}
                                             </td>
                                           </tr>
                                           <tr>
-                                            <td align="center">GREE</td>
-                                            <td align="center">
+                                            <td>GREE</td>
+                                            <td style={{ textAlign: "center" }}>
                                               {product.gree_brand}
                                             </td>
                                           </tr>
                                         </tbody>
-                                      </Table>
+                                      </TableA>
                                     </Card>
                                   </div>
                                 )

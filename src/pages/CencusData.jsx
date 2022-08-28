@@ -19,11 +19,14 @@ import {
 } from "../Axios/Api";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+
+const tester = [];
+
 const CencusData = () => {
   //STATE DICLARE
   const user_details = JSON.parse(localStorage.getItem("login_info"));
   const accessToken = user_details.access_token || null;
-
+  const tester = [];
   const authAxios = axios.create({
     baseURL: URL,
     headers: {
@@ -45,18 +48,21 @@ const CencusData = () => {
       .then((response) => setUpazillaOptions(response.data.upazilaList));
   };
 
-  // const subcategoryDefaultOptions = async (product) => {
-  //   await authAxios
-  //     .post(URL + GET_SUBCATEGORY, {
-  //       id: product.category,
-  //     })
-  //     .then((response) => {
-  //       console.log(response.data.subCategoryList);
-  //       let temp = [...subcategoryOptions, response.data.subCategoryList];
-  //       setSubcategoryOptions(temp);
-  //       delay(5000);
-  //     });
-  // };
+  const subcategoryDefaultOptionsFunction = async (products) => {
+    products.map(
+      async (product) =>
+        await authAxios
+          .post(URL + GET_SUBCATEGORY, {
+            id: product.category,
+          })
+          .then((response) =>
+            setSubcategoryDefaultOptions((subcategoryOptions) => [
+              ...subcategoryOptions,
+              response.data.subCategoryList,
+            ])
+          )
+    );
+  };
 
   const [defaultDivisonValue, setDefaultDivisonValue] = useState("");
   const [defaultDistrictValue, setDefaultDistrictValue] = useState("");
@@ -78,10 +84,14 @@ const CencusData = () => {
   const [asm, setAsm] = useState("");
   const [tsm, settsm] = useState("");
   const [subcategoryOptions, setSubcategoryOptions] = useState([]);
+  const [subcategoryDefaultOptions, setSubcategoryDefaultOptions] = useState(
+    []
+  );
   const [productDetails, setProductDetails] = useState([]);
   const [loading, setLoading] = useState(false);
   let { cencusID } = useParams();
   const navigate = useNavigate();
+
   useEffect(() => {
     async function fetchData() {
       const res = await authAxios
@@ -108,11 +118,7 @@ const CencusData = () => {
           setRetailType(response.data.retail_type);
           setRetail(response.data.retail_name);
           setProductDetails(response.data.enrolled_products);
-
-          // response.data.enrolled_products.map((product) =>
-          //   subcategoryDefaultOptions(product)
-          // );
-
+          subcategoryDefaultOptionsFunction(response.data.enrolled_products);
           setLoading(true);
         });
     }
@@ -154,9 +160,11 @@ const CencusData = () => {
         .post(URL + GET_SUBCATEGORY, {
           id: event.target.value,
         })
-        .then((response) =>
-          setSubcategoryOptions(response.data.subCategoryList)
-        );
+        .then((response) => {
+          const values = [...subcategoryDefaultOptions];
+          values[index] = response.data.subCategoryList;
+          setSubcategoryDefaultOptions(values);
+        });
     };
     getSubcategoryList();
   };
@@ -264,6 +272,8 @@ const CencusData = () => {
         <div className="row">
           <div className="col-12">
             <div className="card">
+              {subcategoryDefaultOptions.length !== 0 &&
+                console.log(subcategoryDefaultOptions)}
               {loading && (
                 <Form className="mx-6" onSubmit={handleSubmit}>
                   <div className="row mt-5">
@@ -322,7 +332,6 @@ const CencusData = () => {
                       >
                         <Form.Label>
                           <span style={{ fontWeight: "bold" }}>
-                            {" "}
                             Upazila/Metro/Town
                           </span>
                         </Form.Label>
@@ -414,26 +423,6 @@ const CencusData = () => {
                           </Select>
                         </FormControl>
                       </Form.Group>
-                      {/* <Form.Group
-                        className="mb-4"
-                        controlId="exampleForm.ControlInput1"
-                      >
-                        <Form.Label>
-                          <span style={{ fontWeight: "bold" }}>
-                            Retail Type
-                          </span>
-                        </Form.Label>
-                        <div>
-                          <TextField
-                            fullWidth
-                            required={true}
-                            className="mt-2"
-                            label="Enter retail type"
-                            value={retailType}
-                            onChange={(e) => setRetailType(e.target.value)}
-                          />
-                        </div>
-                      </Form.Group> */}
                     </div>
                     <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-4	col-xxl-4">
                       <Form.Group
@@ -713,15 +702,18 @@ const CencusData = () => {
                                     handleSubcategoryChange(index, event);
                                   }}
                                 >
-                                  {subcategoryOptions.map((option, index) => (
-                                    <MenuItem
-                                      key={option.Sub_Cat_ID}
-                                      value={option.Sub_Cat_ID}
-                                      name={option.Sub_Cat_Name}
-                                    >
-                                      {option.Sub_Category_Name}
-                                    </MenuItem>
-                                  ))}
+                                  {subcategoryDefaultOptions.length !== 0 &&
+                                    subcategoryDefaultOptions[index].map(
+                                      (option, index) => (
+                                        <MenuItem
+                                          key={option.Sub_Cat_ID}
+                                          value={option.Sub_Cat_ID}
+                                          name={option.Sub_Cat_Name}
+                                        >
+                                          {option.Sub_Category_Name}
+                                        </MenuItem>
+                                      )
+                                    )}
                                 </Select>
                               </FormControl>
                             </Form.Group>
