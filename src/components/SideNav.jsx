@@ -39,7 +39,7 @@ const SideNav = () => {
               style={({ isActive }) => (isActive ? activeStyle : undefined)}
             >
               <ViewList />
-              <span className="align-middle">Cencus Data List</span>
+              <span className="align-middle">Census Data List</span>
             </NavLink>
           </li>
 

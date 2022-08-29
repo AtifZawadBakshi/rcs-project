@@ -120,7 +120,7 @@ const CencusDataList = () => {
       <div className="container-fluid p-0 m-0">
         <div className="d-flex justify-content-between align-items-center">
           <h1 className="h3 mb-3" style={{ fontWeight: "bold" }}>
-            Cencus Data List
+            Census Data List
           </h1>
 
           <button className="btn btn-success mb-3" onClick={modalonExcelClick}>
@@ -161,11 +161,11 @@ const CencusDataList = () => {
                   <th align="center">Division Name</th>
                   <th align="center">District Name</th>
                   <th align="center">Upazila/Metro/Town Name</th>
-                  <th align="center">Location Details</th>
+                  <th align="center">Address</th>
                   <th align="center">Retail Name</th>
                   <th align="center">Retail Type</th>
                   <th align="center">Store Size</th>
-                  <th align="center">Fel Partner </th>
+                  <th align="center">FEL Partner </th>
                   <th align="center">DMS Code</th>
                   <th align="center">Owner Name</th>
                   <th align="center">Owner Number</th>
@@ -299,7 +299,7 @@ const CencusDataList = () => {
                                         <Visibility />
                                         Show
                                       </Button>
-                                      {user_details.isAdmin === false && (
+                                      {user_details.isAdmin === true && (
                                         <Link
                                           to={`/cencus-datalist/${data.transId}`}
                                         >
@@ -359,7 +359,7 @@ const CencusDataList = () => {
                                       </td>
                                     </tr>
                                     <tr>
-                                      <th>Location Details:</th>
+                                      <th>Address:</th>
                                       <td style={{ textAlign: "left" }}>
                                         {modalData.location_details}
                                       </td>

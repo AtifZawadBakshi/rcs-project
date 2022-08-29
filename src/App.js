@@ -38,10 +38,12 @@ function App() {
                   exact
                 />
                 <Route path="cencus-datalist" element={<CencusDataList />} />
-                <Route
-                  path="cencus-datalist/:cencusID"
-                  element={<CencusData />}
-                />
+                {user_details.isAdmin === true && (
+                  <Route
+                    path="cencus-datalist/:cencusID"
+                    element={<CencusData />}
+                  />
+                )}
               </Route>
             </Routes>
             <Footer />

@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import Swal from "sweetalert2";
 import {
   URL,
+  GET_DMS_CODE,
   UPDATE_DATA,
   GET_UPAZILA,
   GET_DISTRICT,
@@ -19,8 +20,6 @@ import {
 } from "../Axios/Api";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-
-const tester = [];
 
 const CencusData = () => {
   //STATE DICLARE
@@ -55,12 +54,16 @@ const CencusData = () => {
           .post(URL + GET_SUBCATEGORY, {
             id: product.category,
           })
-          .then((response) =>
+          .then((response) => {
             setSubcategoryDefaultOptions((subcategoryOptions) => [
               ...subcategoryOptions,
               response.data.subCategoryList,
-            ])
-          )
+            ]);
+            setDefaultBrandList((brandLists) => [
+              ...brandLists,
+              response.data.brandList,
+            ]);
+          })
     );
   };
 
@@ -78,15 +81,17 @@ const CencusData = () => {
   const [storeSize, setStoreSize] = useState("");
   const [felPartner, setFelPartner] = useState(false);
   const [dmsCode, setDmsCode] = useState("");
+  const [defaultDmsCodeValue, setDefaultDmsCodeValue] = useState("");
+  const [dmsCodeOptions, setDmsCodeOptions] = useState([]);
   const [ownerName, setOwnerName] = useState("");
   const [ownerNumber, setOwnerNumber] = useState("");
   const [csm, setCsm] = useState("");
   const [asm, setAsm] = useState("");
   const [tsm, settsm] = useState("");
-  const [subcategoryOptions, setSubcategoryOptions] = useState([]);
   const [subcategoryDefaultOptions, setSubcategoryDefaultOptions] = useState(
     []
   );
+  const [defaultBrandList, setDefaultBrandList] = useState([]);
   const [productDetails, setProductDetails] = useState([]);
   const [loading, setLoading] = useState(false);
   let { cencusID } = useParams();
@@ -127,6 +132,9 @@ const CencusData = () => {
 
   const handleDivisionChange = (event, newValue) => {
     setDivision(newValue.Division_ID);
+    setDefaultDistrictValue({ District_ID: 0, District_Name: "" });
+    setDefaultUpazilaValue({ Upazila_ID: 0, Upazila_Name: "" });
+    setUpazillaOptions([]);
     const getDistrictList = async () => {
       const res = await authAxios
         .post(URL + GET_DISTRICT, {
@@ -138,6 +146,7 @@ const CencusData = () => {
   };
   const handleDistrictChange = (event, newValue) => {
     setDistrict(newValue.District_ID);
+    setDefaultUpazilaValue({ Upazila_ID: 0, Upazila_Name: "" });
     const getUpazila = async () => {
       const res = await authAxios
         .post(URL + GET_UPAZILA, {
@@ -150,7 +159,9 @@ const CencusData = () => {
   const handleUpazillaChange = (event, newValue) => {
     setUpazila(newValue.Upazila_ID);
   };
-
+  const handleDmsCodeChange = (event, newValue) => {
+    setDmsCode(newValue.DMS_ID);
+  };
   const handleCategoryChange = (index, event) => {
     const values = [...productDetails];
     values[index]["category"] = event.target.value;
@@ -161,6 +172,13 @@ const CencusData = () => {
           id: event.target.value,
         })
         .then((response) => {
+          // const tempsub = [...subcategoryOptions];
+          // tempsub[index] = response.data.subCategoryList;
+          // setSubcategoryOptions(tempsub);
+          const tempbrand = [...defaultBrandList];
+          tempbrand[index] = response.data.brandList;
+          setDefaultBrandList(tempbrand);
+
           const values = [...subcategoryDefaultOptions];
           values[index] = response.data.subCategoryList;
           setSubcategoryDefaultOptions(values);
@@ -268,7 +286,7 @@ const CencusData = () => {
   return (
     <main className="content">
       <div className="container-fluid p-0">
-        <h1 className="h3 mb-3">CENCUS DATA DETAILS</h1>
+        <h1 className="h3 mb-3">CENSUS DATA DETAILS</h1>
         <div className="row">
           <div className="col-12">
             <div className="card">
@@ -308,6 +326,7 @@ const CencusData = () => {
                           <span style={{ fontWeight: "bold" }}> Disctrict</span>
                         </Form.Label>
                         <Autocomplete
+                          key={districtOptions}
                           disabled={false}
                           defaultValue={defaultDistrictValue}
                           className="mt-2"
@@ -336,6 +355,7 @@ const CencusData = () => {
                           </span>
                         </Form.Label>
                         <Autocomplete
+                          key={upazillaOptions}
                           disabled={false}
                           defaultValue={defaultUpazilaValue}
                           className="mt-2"
@@ -359,9 +379,7 @@ const CencusData = () => {
                         controlId="exampleForm.ControlInput1"
                       >
                         <Form.Label>
-                          <span style={{ fontWeight: "bold" }}>
-                            Location Details
-                          </span>
+                          <span style={{ fontWeight: "bold" }}>Address</span>
                         </Form.Label>
                         <div>
                           <TextField
@@ -472,22 +490,31 @@ const CencusData = () => {
                       >
                         <Form.Label id="demo-simple-select-label">
                           <span style={{ fontWeight: "bold" }}>
-                            Fel Partner
+                            FEL Partner
                           </span>
                         </Form.Label>
 
                         <FormControl className="mt-2" fullWidth>
                           <InputLabel id="demo-simple-select-label">
-                            Fel Partner Status
+                            FEL Partner Status
                           </InputLabel>
                           <Select
                             required={true}
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
-                            label="Fel Partner Status"
+                            label="FEL Partner Status"
                             value={felPartner}
                             onChange={(event) => {
                               setFelPartner(event.target.value);
+                              const getDmsCodeList = async () => {
+                                const res = await authAxios
+                                  .get(URL + GET_DMS_CODE)
+                                  .then((response) =>
+                                    setDmsCodeOptions(response.data)
+                                  );
+                              };
+
+                              event.target.value === true && getDmsCodeList();
                             }}
                           >
                             <MenuItem value={true}>Yes</MenuItem>
@@ -503,17 +530,24 @@ const CencusData = () => {
                           className="mb-4"
                           controlId="exampleForm.ControlInput1"
                         >
-                          <Form.Label id="demo-simple-select-label">
+                          <Form.Label>
                             <span style={{ fontWeight: "bold" }}>DMS Code</span>
                           </Form.Label>
-
-                          <TextField
-                            required={true}
-                            fullWidth
+                          <Autocomplete
+                            defaultValue={dmsCode}
+                            disabled={false}
                             className="mt-2"
-                            label="Enter DMS code"
-                            value={dmsCode}
-                            onChange={(e) => setDmsCode(e.target.value)}
+                            onChange={handleDmsCodeChange}
+                            disablePortal
+                            options={dmsCodeOptions}
+                            getOptionLabel={(option) => option.DMS_Code}
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                label="Choose DMS code"
+                                required={true}
+                              />
+                            )}
                           />
                         </Form.Group>
                       </div>
@@ -624,7 +658,7 @@ const CencusData = () => {
                     </div>
                   </div>
 
-                  {productDetails.map((product, index) => (
+                  {/* {productDetails.map((product, index) => (
                     <div key={product.ID}>
                       <div className="row mt-6">
                         <div className="col-12	col-sm-12	col-md-5	col-lg-5	col-xl-5	col-xxl-5 ">
@@ -671,7 +705,6 @@ const CencusData = () => {
                             </Form.Group>
                           </div>
                         </div>
-
                         <div className="col-12	col-sm-12	col-md-6	col-lg-5	col-xl-6	col-xxl-6 ">
                           <div className=" row d-flex justify-content-between align-items-center">
                             <Form.Label className="col-4">
@@ -719,370 +752,388 @@ const CencusData = () => {
                             </Form.Group>
                           </div>
                         </div>
-                        {/* {productDetails.length > 1 &&
-                        productDetails.length - 1 === index ? (
-                          <div className="col-12	col-sm-12	col-md-1	col-lg-1	col-xl-1	col-xxl-1 ">
-                            <div className="d-flex justify-content-end align-items-center">
-                              <Button
-                                className="mx-2"
-                                variant="danger"
-                                onClick={() => handleRemoveButton(index)}
+                      </div>
+                      {defaultBrandList[index].length !== 0 && (
+                        <div className="row mt-3">
+                          {defaultBrandList[index][0].isActive === "TRUE" && (
+                            <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
+                              <Form.Group
+                                className="mb-4"
+                                controlId="exampleForm.ControlInput1"
                               >
-                                <Delete />
-                              </Button>
+                                <Form.Label>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {brandList[0]}
+                                  </span>
+                                </Form.Label>
+                                <TextField
+                                  type="number"
+                                  fullWidth
+                                  name="samsumg_brand"
+                                  className="mt-2"
+                                  label="Enter amount"
+                                  value={product.samsumg_brand}
+                                  onChange={(event) => {
+                                    handleChangeInput(index, event);
+                                  }}
+                                />
+                              </Form.Group>
                             </div>
-                          </div>
-                        ) : null} */}
-                      </div>
-                      <div className="row mt-3">
-                        <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
-                          <Form.Group
-                            className="mb-4"
-                            controlId="exampleForm.ControlInput1"
-                          >
-                            <Form.Label>
-                              <span style={{ fontWeight: "bold" }}>
-                                {brandList[0]}
-                              </span>
-                            </Form.Label>
-                            <TextField
-                              type="number"
-                              fullWidth
-                              name="samsumg_brand"
-                              className="mt-2"
-                              label="Enter amount"
-                              value={product.samsumg_brand}
-                              onChange={(event) => {
-                                handleChangeInput(index, event);
-                              }}
-                            />
-                          </Form.Group>
+                          )}
+                          {defaultBrandList[index][1].isActive === "TRUE" && (
+                            <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
+                              <Form.Group
+                                className="mb-4"
+                                controlId="exampleForm.ControlInput1"
+                              >
+                                <Form.Label>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {brandList[1]}
+                                  </span>
+                                </Form.Label>
+                                <TextField
+                                  fullWidth
+                                  type="number"
+                                  className="mt-2"
+                                  name="sony_brand"
+                                  label="Enter amount"
+                                  value={product.sony_brand}
+                                  onChange={(event) => {
+                                    handleChangeInput(index, event);
+                                  }}
+                                />
+                              </Form.Group>
+                            </div>
+                          )}
+                          {defaultBrandList[index][2].isActive === "TRUE" && (
+                            <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
+                              <Form.Group
+                                className="mb-4"
+                                controlId="exampleForm.ControlInput1"
+                              >
+                                <Form.Label>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {brandList[2]}
+                                  </span>
+                                </Form.Label>
+                                <TextField
+                                  fullWidth
+                                  name="lg_brand"
+                                  type="number"
+                                  className="mt-2"
+                                  label="Enter amount"
+                                  value={product.lg_brand}
+                                  onChange={(event) => {
+                                    handleChangeInput(index, event);
+                                  }}
+                                />
+                              </Form.Group>
+                            </div>
+                          )}
+                          {defaultBrandList[index][3].isActive === "TRUE" && (
+                            <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
+                              <Form.Group
+                                className="mb-4"
+                                controlId="exampleForm.ControlInput1"
+                              >
+                                <Form.Label>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {brandList[3]}
+                                  </span>
+                                </Form.Label>
+                                <TextField
+                                  fullWidth
+                                  name="oth_foreign_brand"
+                                  type="number"
+                                  className="mt-2"
+                                  label="Enter amount"
+                                  value={product.oth_foreign_brand}
+                                  onChange={(event) => {
+                                    handleChangeInput(index, event);
+                                  }}
+                                />
+                              </Form.Group>
+                            </div>
+                          )}
+                          {defaultBrandList[index][4].isActive === "TRUE" && (
+                            <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
+                              <Form.Group
+                                className="mb-4"
+                                controlId="exampleForm.ControlInput1"
+                              >
+                                <Form.Label>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {brandList[4]}
+                                  </span>
+                                </Form.Label>
+                                <TextField
+                                  fullWidth
+                                  name="walton_brand"
+                                  type="number"
+                                  className="mt-2"
+                                  label="Enter amount"
+                                  value={product.walton_brand}
+                                  onChange={(event) => {
+                                    handleChangeInput(index, event);
+                                  }}
+                                />
+                              </Form.Group>
+                            </div>
+                          )}
+                          {defaultBrandList[index][5].isActive === "TRUE" && (
+                            <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
+                              <Form.Group
+                                className="mb-4"
+                                controlId="exampleForm.ControlInput1"
+                              >
+                                <Form.Label>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {brandList[5]}
+                                  </span>
+                                </Form.Label>
+                                <TextField
+                                  fullWidth
+                                  name="singer_brand"
+                                  className="mt-2"
+                                  type="number"
+                                  label="Enter amount"
+                                  value={product.singer_brand}
+                                  onChange={(event) => {
+                                    handleChangeInput(index, event);
+                                  }}
+                                />
+                              </Form.Group>
+                            </div>
+                          )}
+                          {defaultBrandList[index][6].isActive === "TRUE" && (
+                            <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
+                              <Form.Group
+                                className="mb-4"
+                                controlId="exampleForm.ControlInput1"
+                              >
+                                <Form.Label>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {brandList[6]}
+                                  </span>
+                                </Form.Label>
+                                <TextField
+                                  type="number"
+                                  name="vision_brand"
+                                  fullWidth
+                                  className="mt-2"
+                                  label="Enter amount"
+                                  value={product.vision_brand}
+                                  onChange={(event) => {
+                                    handleChangeInput(index, event);
+                                  }}
+                                />
+                              </Form.Group>
+                            </div>
+                          )}
+                          {defaultBrandList[index][7].isActive === "TRUE" && (
+                            <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
+                              <Form.Group
+                                className="mb-4"
+                                controlId="exampleForm.ControlInput1"
+                              >
+                                <Form.Label>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {brandList[7]}
+                                  </span>
+                                </Form.Label>
+                                <TextField
+                                  fullWidth
+                                  name="oth_bd_brand"
+                                  className="mt-2"
+                                  type="number"
+                                  label="Enter amount"
+                                  value={product.oth_bd_brand}
+                                  onChange={(event) => {
+                                    handleChangeInput(index, event);
+                                  }}
+                                />
+                              </Form.Group>
+                            </div>
+                          )}
+                          {defaultBrandList[index][8].isActive === "TRUE" && (
+                            <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
+                              <Form.Group
+                                className="mb-4"
+                                controlId="exampleForm.ControlInput1"
+                              >
+                                <Form.Label>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {brandList[8]}
+                                  </span>
+                                </Form.Label>
+                                <TextField
+                                  fullWidth
+                                  name="hitachi_brand"
+                                  className="mt-2"
+                                  type="number"
+                                  label="Enter amount"
+                                  value={product.hitachi_brand}
+                                  onChange={(event) => {
+                                    handleChangeInput(index, event);
+                                  }}
+                                />
+                              </Form.Group>
+                            </div>
+                          )}
+                          {defaultBrandList[index][9].isActive === "TRUE" && (
+                            <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
+                              <Form.Group
+                                className="mb-4"
+                                controlId="exampleForm.ControlInput1"
+                              >
+                                <Form.Label>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {brandList[9]}
+                                  </span>
+                                </Form.Label>
+                                <TextField
+                                  fullWidth
+                                  name="jamuna_brand"
+                                  className="mt-2"
+                                  type="number"
+                                  label="Enter amount"
+                                  value={product.jamuna_brand}
+                                  onChange={(event) => {
+                                    handleChangeInput(index, event);
+                                  }}
+                                />
+                              </Form.Group>
+                            </div>
+                          )}
+                          {defaultBrandList[index][10].isActive === "TRUE" && (
+                            <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
+                              <Form.Group
+                                className="mb-4"
+                                controlId="exampleForm.ControlInput1"
+                              >
+                                <Form.Label>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {brandList[10]}
+                                  </span>
+                                </Form.Label>
+                                <TextField
+                                  fullWidth
+                                  name="sharp_brand"
+                                  className="mt-2"
+                                  type="number"
+                                  label="Enter amount"
+                                  value={product.sharp_brand}
+                                  onChange={(event) => {
+                                    handleChangeInput(index, event);
+                                  }}
+                                />
+                              </Form.Group>
+                            </div>
+                          )}
+                          {defaultBrandList[index][11].isActive === "TRUE" && (
+                            <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
+                              <Form.Group
+                                className="mb-4"
+                                controlId="exampleForm.ControlInput1"
+                              >
+                                <Form.Label>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {brandList[11]}
+                                  </span>
+                                </Form.Label>
+                                <TextField
+                                  fullWidth
+                                  name="eco_plus_brand"
+                                  className="mt-2"
+                                  type="number"
+                                  label="Enter amount"
+                                  value={product.eco_plus_brand}
+                                  onChange={(event) => {
+                                    handleChangeInput(index, event);
+                                  }}
+                                />
+                              </Form.Group>
+                            </div>
+                          )}
+                          {defaultBrandList[index][12].isActive === "TRUE" && (
+                            <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
+                              <Form.Group
+                                className="mb-4"
+                                controlId="exampleForm.ControlInput1"
+                              >
+                                <Form.Label>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {brandList[12]}
+                                  </span>
+                                </Form.Label>
+                                <TextField
+                                  fullWidth
+                                  name="miyako_brand"
+                                  className="mt-2"
+                                  type="number"
+                                  label="Enter amount"
+                                  value={product.miyako_brand}
+                                  onChange={(event) => {
+                                    handleChangeInput(index, event);
+                                  }}
+                                />
+                              </Form.Group>
+                            </div>
+                          )}
+                          {defaultBrandList[index][13].isActive === "TRUE" && (
+                            <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
+                              <Form.Group
+                                className="mb-4"
+                                controlId="exampleForm.ControlInput1"
+                              >
+                                <Form.Label>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {brandList[13]}
+                                  </span>
+                                </Form.Label>
+                                <TextField
+                                  fullWidth
+                                  name="gree_brand"
+                                  className="mt-2"
+                                  type="number"
+                                  label="Enter amount"
+                                  value={product.gree_brand}
+                                  onChange={(event) => {
+                                    handleChangeInput(index, event);
+                                  }}
+                                />
+                              </Form.Group>
+                            </div>
+                          )}
+                          {defaultBrandList[index][14].isActive === "TRUE" && (
+                            <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
+                              <Form.Group
+                                className="mb-4"
+                                controlId="exampleForm.ControlInput1"
+                              >
+                                <Form.Label>
+                                  <span style={{ fontWeight: "bold" }}>
+                                    {brandList[14]}
+                                  </span>
+                                </Form.Label>
+                                <TextField
+                                  fullWidth
+                                  name="midea_brand"
+                                  className="mt-2"
+                                  type="number"
+                                  label="Enter amount"
+                                  value={product.midea_brand}
+                                  onChange={(event) => {
+                                    handleChangeInput(index, event);
+                                  }}
+                                />
+                              </Form.Group>
+                            </div>
+                          )}
                         </div>
-                        <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
-                          <Form.Group
-                            className="mb-4"
-                            controlId="exampleForm.ControlInput1"
-                          >
-                            <Form.Label>
-                              <span style={{ fontWeight: "bold" }}>
-                                {brandList[1]}
-                              </span>
-                            </Form.Label>
-                            <TextField
-                              fullWidth
-                              type="number"
-                              className="mt-2"
-                              name="sony_brand"
-                              label="Enter amount"
-                              value={product.sony_brand}
-                              onChange={(event) => {
-                                handleChangeInput(index, event);
-                              }}
-                            />
-                          </Form.Group>
-                        </div>
-                        <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
-                          <Form.Group
-                            className="mb-4"
-                            controlId="exampleForm.ControlInput1"
-                          >
-                            <Form.Label>
-                              <span style={{ fontWeight: "bold" }}>
-                                {brandList[2]}
-                              </span>
-                            </Form.Label>
-                            <TextField
-                              fullWidth
-                              name="lg_brand"
-                              type="number"
-                              className="mt-2"
-                              label="Enter amount"
-                              value={product.lg_brand}
-                              onChange={(event) => {
-                                handleChangeInput(index, event);
-                              }}
-                            />
-                          </Form.Group>
-                        </div>
-                        <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
-                          <Form.Group
-                            className="mb-4"
-                            controlId="exampleForm.ControlInput1"
-                          >
-                            <Form.Label>
-                              <span style={{ fontWeight: "bold" }}>
-                                {brandList[3]}
-                              </span>
-                            </Form.Label>
-                            <TextField
-                              fullWidth
-                              name="oth_foreign_brand"
-                              type="number"
-                              className="mt-2"
-                              label="Enter amount"
-                              value={product.oth_foreign_brand}
-                              onChange={(event) => {
-                                handleChangeInput(index, event);
-                              }}
-                            />
-                          </Form.Group>
-                        </div>
-                        <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
-                          <Form.Group
-                            className="mb-4"
-                            controlId="exampleForm.ControlInput1"
-                          >
-                            <Form.Label>
-                              <span style={{ fontWeight: "bold" }}>
-                                {brandList[4]}
-                              </span>
-                            </Form.Label>
-                            <TextField
-                              fullWidth
-                              name="walton_brand"
-                              type="number"
-                              className="mt-2"
-                              label="Enter amount"
-                              value={product.walton_brand}
-                              onChange={(event) => {
-                                handleChangeInput(index, event);
-                              }}
-                            />
-                          </Form.Group>
-                        </div>
-                        <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
-                          <Form.Group
-                            className="mb-4"
-                            controlId="exampleForm.ControlInput1"
-                          >
-                            <Form.Label>
-                              <span style={{ fontWeight: "bold" }}>
-                                {brandList[5]}
-                              </span>
-                            </Form.Label>
-                            <TextField
-                              fullWidth
-                              name="singer_brand"
-                              className="mt-2"
-                              type="number"
-                              label="Enter amount"
-                              value={product.singer_brand}
-                              onChange={(event) => {
-                                handleChangeInput(index, event);
-                              }}
-                            />
-                          </Form.Group>
-                        </div>
-                        <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
-                          <Form.Group
-                            className="mb-4"
-                            controlId="exampleForm.ControlInput1"
-                          >
-                            <Form.Label>
-                              <span style={{ fontWeight: "bold" }}>
-                                {brandList[6]}
-                              </span>
-                            </Form.Label>
-                            <TextField
-                              type="number"
-                              name="vision_brand"
-                              fullWidth
-                              className="mt-2"
-                              label="Enter amount"
-                              value={product.vision_brand}
-                              onChange={(event) => {
-                                handleChangeInput(index, event);
-                              }}
-                            />
-                          </Form.Group>
-                        </div>
-                        <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
-                          <Form.Group
-                            className="mb-4"
-                            controlId="exampleForm.ControlInput1"
-                          >
-                            <Form.Label>
-                              <span style={{ fontWeight: "bold" }}>
-                                {brandList[7]}
-                              </span>
-                            </Form.Label>
-                            <TextField
-                              fullWidth
-                              name="oth_bd_brand"
-                              className="mt-2"
-                              type="number"
-                              label="Enter amount"
-                              value={product.oth_bd_brand}
-                              onChange={(event) => {
-                                handleChangeInput(index, event);
-                              }}
-                            />
-                          </Form.Group>
-                        </div>
-                        <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
-                          <Form.Group
-                            className="mb-4"
-                            controlId="exampleForm.ControlInput1"
-                          >
-                            <Form.Label>
-                              <span style={{ fontWeight: "bold" }}>
-                                {brandList[8]}
-                              </span>
-                            </Form.Label>
-                            <TextField
-                              fullWidth
-                              name="hitachi_brand"
-                              className="mt-2"
-                              type="number"
-                              label="Enter amount"
-                              value={product.hitachi_brand}
-                              onChange={(event) => {
-                                handleChangeInput(index, event);
-                              }}
-                            />
-                          </Form.Group>
-                        </div>
-                        <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
-                          <Form.Group
-                            className="mb-4"
-                            controlId="exampleForm.ControlInput1"
-                          >
-                            <Form.Label>
-                              <span style={{ fontWeight: "bold" }}>
-                                {brandList[9]}
-                              </span>
-                            </Form.Label>
-                            <TextField
-                              fullWidth
-                              name="jamuna_brand"
-                              className="mt-2"
-                              type="number"
-                              label="Enter amount"
-                              value={product.jamuna_brand}
-                              onChange={(event) => {
-                                handleChangeInput(index, event);
-                              }}
-                            />
-                          </Form.Group>
-                        </div>
-                        <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
-                          <Form.Group
-                            className="mb-4"
-                            controlId="exampleForm.ControlInput1"
-                          >
-                            <Form.Label>
-                              <span style={{ fontWeight: "bold" }}>
-                                {brandList[10]}
-                              </span>
-                            </Form.Label>
-                            <TextField
-                              fullWidth
-                              name="sharp_brand"
-                              className="mt-2"
-                              type="number"
-                              label="Enter amount"
-                              value={product.sharp_brand}
-                              onChange={(event) => {
-                                handleChangeInput(index, event);
-                              }}
-                            />
-                          </Form.Group>
-                        </div>
-                        <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
-                          <Form.Group
-                            className="mb-4"
-                            controlId="exampleForm.ControlInput1"
-                          >
-                            <Form.Label>
-                              <span style={{ fontWeight: "bold" }}>
-                                {brandList[11]}
-                              </span>
-                            </Form.Label>
-                            <TextField
-                              fullWidth
-                              name="eco_plus_brand"
-                              className="mt-2"
-                              type="number"
-                              label="Enter amount"
-                              value={product.eco_plus_brand}
-                              onChange={(event) => {
-                                handleChangeInput(index, event);
-                              }}
-                            />
-                          </Form.Group>
-                        </div>
-                        <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
-                          <Form.Group
-                            className="mb-4"
-                            controlId="exampleForm.ControlInput1"
-                          >
-                            <Form.Label>
-                              <span style={{ fontWeight: "bold" }}>
-                                {brandList[12]}
-                              </span>
-                            </Form.Label>
-                            <TextField
-                              fullWidth
-                              name="miyako_brand"
-                              className="mt-2"
-                              type="number"
-                              label="Enter amount"
-                              value={product.miyako_brand}
-                              onChange={(event) => {
-                                handleChangeInput(index, event);
-                              }}
-                            />
-                          </Form.Group>
-                        </div>
-                        <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
-                          <Form.Group
-                            className="mb-4"
-                            controlId="exampleForm.ControlInput1"
-                          >
-                            <Form.Label>
-                              <span style={{ fontWeight: "bold" }}>
-                                {brandList[13]}
-                              </span>
-                            </Form.Label>
-                            <TextField
-                              fullWidth
-                              name="gree_brand"
-                              className="mt-2"
-                              type="number"
-                              label="Enter amount"
-                              value={product.gree_brand}
-                              onChange={(event) => {
-                                handleChangeInput(index, event);
-                              }}
-                            />
-                          </Form.Group>
-                        </div>
-                        <div className="col-12	col-sm-12	col-md-6	col-lg-6	col-xl-3	col-xxl-3">
-                          <Form.Group
-                            className="mb-4"
-                            controlId="exampleForm.ControlInput1"
-                          >
-                            <Form.Label>
-                              <span style={{ fontWeight: "bold" }}>
-                                {brandList[14]}
-                              </span>
-                            </Form.Label>
-                            <TextField
-                              fullWidth
-                              name="midea_brand"
-                              className="mt-2"
-                              type="number"
-                              label="Enter amount"
-                              value={product.midea_brand}
-                              onChange={(event) => {
-                                handleChangeInput(index, event);
-                              }}
-                            />
-                          </Form.Group>
-                        </div>
-                      </div>
+                      )}
                     </div>
-                  ))}
+                  ))} */}
 
                   <div className="row mt-4 mb-5">
                     <div className="d-flex justify-content-end align-content-center">
