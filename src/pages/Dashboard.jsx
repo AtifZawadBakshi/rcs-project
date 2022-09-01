@@ -8,6 +8,7 @@ import { brandList } from "../demoData";
 import divisionList from "../demoData";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import InputAdornment from "@mui/material/InputAdornment";
 import Swal from "sweetalert2";
 import {
   URL,
@@ -203,6 +204,7 @@ const Dashboard = () => {
   };
   const handleSubmit = (event) => {
     event.preventDefault();
+    let phn = "01" + ownerNumber;
     let submittedData = {
       district: district,
       division: division,
@@ -214,7 +216,7 @@ const Dashboard = () => {
       fel_partner: felPartner,
       dms_code: dmsCode,
       owner_name: ownerName,
-      owner_number: ownerNumber,
+      owner_number: phn,
       csm: csm,
       asm: asm,
       tsm: tsm,
@@ -222,7 +224,11 @@ const Dashboard = () => {
     };
     console.log(submittedData);
     const submitData = async () => {
-      await authAxios.post(URL + SUBMIT_DATA, submittedData);
+      await authAxios
+        .post(URL + SUBMIT_DATA, submittedData)
+        .then((response) => {
+          response.data === "Successful" && window.location.reload(false);
+        });
     };
 
     Swal.fire({
@@ -584,15 +590,26 @@ const Dashboard = () => {
                       controlId="exampleForm.ControlInput1"
                     >
                       <Form.Label>
-                        <span style={{ fontWeight: "bold" }}>Owner Number</span>
+                        <span style={{ fontWeight: "bold" }}>
+                          Owner Contact Number
+                        </span>
                       </Form.Label>
                       <TextField
                         required={true}
                         fullWidth
                         className="mt-2"
                         type="number"
-                        inputProps={{ maxLength: 11 }}
-                        label="Enter owner number"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">01</InputAdornment>
+                          ),
+                        }}
+                        onInput={(e) => {
+                          e.target.value = Math.max(0, parseInt(e.target.value))
+                            .toString()
+                            .slice(0, 9);
+                        }}
+                        label="Enter contact number"
                         value={ownerNumber}
                         onChange={(e) => setOwnerNumber(e.target.value)}
                       />

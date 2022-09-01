@@ -1,14 +1,19 @@
 import React from "react";
 import {
   AccountBox,
-  Menu,
   LogoutOutlined,
   AccountCircle,
   ExpandCircleDown,
+  MenuOutlined,
+  ViewList,
+  DashboardCustomizeOutlined,
 } from "@mui/icons-material";
 
 import { useNavigate } from "react-router-dom";
 
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import { NavLink } from "react-router-dom";
 const Header = () => {
   const navigate = useNavigate();
   let user_details = JSON.parse(localStorage.getItem("login_info"));
@@ -18,15 +23,52 @@ const Header = () => {
     navigate("/login");
     window.location.reload();
   };
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   return (
     <nav className="navbar navbar-expand navbar-light navbar-bg">
       <div className="sidebar-toggle js-sidebar-toggle d-inline-block d-lg-none mb-2">
-        <Menu
+        <MenuOutlined
           sx={{
             color: "black",
             fontSize: "40px",
           }}
+          id="basic-button"
+          aria-controls={open ? "basic-menu" : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? "true" : undefined}
+          onClick={handleClick}
         />
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          MenuListProps={{
+            "aria-labelledby": "basic-button",
+          }}
+        >
+          <MenuItem onClick={handleClose}>
+            <NavLink className="sidebar-link" to="/cencus-datalist">
+              <ViewList />
+              <span className="align-middle">Census Data List</span>
+            </NavLink>
+          </MenuItem>
+          {user_details.isAdmin === false && (
+            <MenuItem onClick={handleClose}>
+              <NavLink className="sidebar-link" to="/">
+                <DashboardCustomizeOutlined />
+                <span className="align-middle">RCS</span>
+              </NavLink>
+            </MenuItem>
+          )}
+        </Menu>
       </div>
       <div className="navbar-collapse collapse">
         <ul className="navbar-nav navbar-align">

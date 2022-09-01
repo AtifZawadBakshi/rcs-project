@@ -1,6 +1,6 @@
-export const URL = "http://10.100.19.77:5000/";
-
+// export const URL = "http://10.100.19.77:5000/";
 // export const URL = "http://10.100.10.60:5000/";
+export const URL = "http://202.84.44.229:5000/";
 export const GET_DISTRICT = "district";
 export const GET_UPAZILA = "upazila";
 export const GET_SUBCATEGORY = "subcategory";
