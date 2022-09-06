@@ -8,12 +8,29 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import { Download, Edit, Search, Visibility } from "@mui/icons-material";
+import Swal from "sweetalert2";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import {
+  Delete,
+  Download,
+  Edit,
+  Search,
+  SearchOutlined,
+  Visibility,
+} from "@mui/icons-material";
 import { Button } from "react-bootstrap";
 import { styled } from "@mui/material/styles";
 import Modal from "react-bootstrap/Modal";
 import { Card, Input, InputAdornment, LinearProgress } from "@mui/material";
-import { URL, FETCH_DATA, EXCEL_DATA, GET_SUBCATEGORY } from "../Axios/Api";
+import {
+  URL,
+  FETCH_DATA,
+  EXCEL_DATA,
+  GET_SUBCATEGORY,
+  DELETE_DATA,
+  SEARCH_DATA,
+} from "../Axios/Api";
 import axios from "axios";
 import { Link, Outlet } from "react-router-dom";
 
@@ -67,10 +84,18 @@ const CencusDataList = () => {
   const [modalShow, setModalShow] = React.useState(false);
   const [modalData, setModalData] = React.useState([]);
   const [submittedData, setSubmittedData] = useState([]);
+  const [searchInput, setSearchInput] = React.useState("");
   const [loading, setLoading] = useState(false);
   const [modalExcelShow, setModalExcelShow] = React.useState(false);
   const [modalExccelData, setModalExcelData] = React.useState([]);
-
+  async function fetchData() {
+    const res = await authAxios.get(URL + FETCH_DATA).then((response) => {
+      console.log(response);
+      setSubmittedData(response.data);
+      setFilterDataList(response.data);
+      setLoading(true);
+    });
+  }
   const modalonExcelClick = async () => {
     async function fetchData() {
       const res = await authAxios.get(URL + EXCEL_DATA).then((response) => {
@@ -92,21 +117,25 @@ const CencusDataList = () => {
     XLSX.writeFile(wb, "RCSDataSheet.xlsx");
   };
   useEffect(() => {
-    async function fetchData() {
-      const res = await authAxios.get(URL + FETCH_DATA).then((response) => {
-        setSubmittedData(response.data);
-        setFilterDataList(response.data);
-        setLoading(true);
-      });
-    }
-
     fetchData();
   }, []);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
-
+  const handleSearchClick = () => {
+    async function searchedData() {
+      const res = await axios
+        .post(URL + SEARCH_DATA, {
+          searchObj: searchInput,
+        })
+        .then((response) => {
+          console.log(response);
+          // setSubmittedData(response.data);
+        });
+    }
+    searchedData();
+  };
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(event.target.value);
     setPage(0);
@@ -114,6 +143,39 @@ const CencusDataList = () => {
   const modalonClick = async (event) => {
     setModalData(event);
     setModalShow(true);
+  };
+  const handleDeleteButton = async (event) => {
+    async function deleteData() {
+      const res = await authAxios
+        .patch(URL + DELETE_DATA + "/" + event.transId)
+        .then((response) => {
+          console.log(response);
+          response.data === "Success" &&
+            toast.success("Successfully Removed!", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+            });
+          fetchData();
+        });
+    }
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteData();
+      }
+    });
   };
   const modalonClose = (event) => {
     setModalShow(false);
@@ -187,23 +249,59 @@ const CencusDataList = () => {
             className="form-control"
             onChange={filterData}
           /> */}
-
-          <Input
-            type="text"
-            id="searchInput"
-            placeholder="Type Here for Search..."
-            onChange={handleQuery}
-            startAdornment={
-              <InputAdornment position="start">
-                <Search />
-              </InputAdornment>
-            }
-          />
-          <button className="btn btn-success mb-3" onClick={modalonExcelClick}>
-            <Download />
-            Export to Excel
-          </button>
+          <div
+            className="right"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                margin: "10px",
+                border: "1px solid lightgray",
+                justifyContent: "center",
+                padding: "3px",
+                borderRadius: "5px",
+              }}
+            >
+              <input
+                type="text"
+                placeholder="Search..."
+                style={{ border: "none" }}
+                value={searchInput}
+                onChange={(event) => {
+                  setSearchInput(event.target.value);
+                }}
+              />
+              <button
+                type="button"
+                className="btn btn-dark"
+                onClick={handleSearchClick}
+              >
+                <SearchOutlined />
+              </button>
+            </div>
+            {/* <Input
+              type="text"
+              id="searchInput"
+              placeholder="Type Here for Search..."
+              onChange={handleQuery}
+              startAdornment={
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              }
+            /> */}
+            <button className="btn btn-success" onClick={modalonExcelClick}>
+              <Download />
+              Export to Excel
+            </button>
+          </div>
         </div>
+
         <Modal
           show={modalExcelShow}
           onHide={modalonExcelClose}
@@ -386,6 +484,23 @@ const CencusDataList = () => {
                                             </Button>
                                           </Link>
                                         )}
+                                        {user_details.isAdmin === true && (
+                                          <Button
+                                            variant="danger"
+                                            sx={{
+                                              ":hover": {
+                                                border: "6px solid",
+                                              },
+                                            }}
+                                            onClick={() =>
+                                              handleDeleteButton(data)
+                                            }
+                                          >
+                                            <Delete />
+                                            Delete
+                                          </Button>
+                                        )}
+                                        {<ToastContainer />}
                                       </div>
                                     </TableCell>
                                   </TableRow>
@@ -440,6 +555,23 @@ const CencusDataList = () => {
                                             </Button>
                                           </Link>
                                         )}
+                                        {user_details.isAdmin === true && (
+                                          <Button
+                                            variant="danger"
+                                            sx={{
+                                              ":hover": {
+                                                border: "6px solid",
+                                              },
+                                            }}
+                                            onClick={() =>
+                                              handleDeleteButton(data)
+                                            }
+                                          >
+                                            <Delete />
+                                            Delete
+                                          </Button>
+                                        )}
+                                        {<ToastContainer />}
                                       </div>
                                     </TableCell>
                                   </TableRow>
